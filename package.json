@@ -1,0 +1,18 @@
+{
+  "name": "sodiq-school-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "kill-ports": "node scripts/kill-ports.mjs",
+    "predev": "node scripts/kill-ports.mjs",
+    "prestart": "node scripts/kill-ports.mjs",
+    "dev": "concurrently -n backend,client,admin -c yellow,cyan,magenta \"npm run dev --prefix backend\" \"npm run dev --prefix client-site\" \"npm run dev --prefix admin-site\"",
+    "build": "concurrently -n client,admin \"npm run build --prefix client-site\" \"npm run build --prefix admin-site\"",
+    "start": "concurrently -n backend,client,admin -c yellow,cyan,magenta \"npm start --prefix backend\" \"npm start --prefix client-site\" \"npm start --prefix admin-site\"",
+    "db:reset": "npm run db:reset --prefix backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}
