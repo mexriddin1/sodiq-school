@@ -2,6 +2,13 @@ import type { Locale } from '@/i18n/config';
 
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
 
+// On the server (SSR/build), we can hit the backend directly via loopback to
+// avoid going through public DNS/firewall. Browser code still uses API_BASE.
+const SERVER_API_BASE =
+  typeof window === 'undefined' && process.env.INTERNAL_API_BASE_URL
+    ? process.env.INTERNAL_API_BASE_URL
+    : API_BASE;
+
 // Resolves an /uploads/... URL returned by backend to a fully qualified URL.
 export function resolveMediaUrl(url: string | null | undefined): string {
   if (!url) return '';
@@ -11,7 +18,8 @@ export function resolveMediaUrl(url: string | null | undefined): string {
 }
 
 async function apiFetch<T>(path: string, init?: RequestInit & { revalidate?: number }): Promise<T> {
-  const url = path.startsWith('http') ? path : `${API_BASE}${path}`;
+  const base = SERVER_API_BASE;
+  const url = path.startsWith('http') ? path : `${base}${path}`;
   const res = await fetch(url, {
     ...init,
     headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
