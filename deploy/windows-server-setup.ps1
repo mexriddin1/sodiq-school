@@ -1,81 +1,60 @@
 #requires -RunAsAdministrator
-<#
-    Sodiq School — Windows Server deployment script
-    --------------------------------------------------
-    BIR MARTA serverda ishga tushiriladi:
-      1) RDP orqali serverga ulaning
-      2) PowerShell'ni Administrator sifatida oching
-      3) Quyidagini bajaring:
-
-         iwr -useb https://raw.githubusercontent.com/mexriddin1/sodiq-school/main/deploy/windows-server-setup.ps1 -OutFile C:\setup.ps1
-         Set-ExecutionPolicy -Scope Process Bypass -Force
-         C:\setup.ps1
-
-    Skript quyidagilarni qiladi:
-      - Chocolatey, Node.js 20 LTS, Git, MySQL 8, PM2 o'rnatadi
-      - Repo'ni klonlaydi (C:\sodiq-school)
-      - Parollarni interaktiv so'raydi (yoki .env.deploy faylidan oladi)
-      - .env fayllarni production sozlamalari bilan yaratadi
-      - npm install + build + database seed
-      - PM2 bilan startupga qo'shadi, firewall'da portlarni ochadi
-
-    XAVFSIZLIK: Hech qanday parol skriptning o'zida saqlanmaydi.
-#>
+# Sodiq School - Windows Server deployment script
+# Run on the server in PowerShell (Administrator):
+#   [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+#   iwr -useb https://raw.githubusercontent.com/mexriddin1/sodiq-school/main/deploy/windows-server-setup.ps1 -OutFile C:\setup.ps1
+#   Set-ExecutionPolicy -Scope Process Bypass -Force
+#   C:\setup.ps1
 
 $ErrorActionPreference = "Stop"
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-# ================================================================
-# 1. KONFIGURATSIYA
-# ================================================================
-$RepoUrl   = "https://github.com/mexriddin1/sodiq-school.git"
-$AppRoot   = "C:\sodiq-school"
+# ----- Config -----
+$RepoUrl = "https://github.com/mexriddin1/sodiq-school.git"
+$AppRoot = "C:\sodiq-school"
 
 function Write-Step($msg) {
     Write-Host ""
     Write-Host "==> $msg" -ForegroundColor Cyan
 }
 
-function Read-SecretLine($prompt, $default = $null) {
+function Read-WithDefault($prompt, $default) {
     if ($default) {
-        $input = Read-Host "$prompt [default: $default]"
-        if ([string]::IsNullOrWhiteSpace($input)) { return $default }
-        return $input
+        $val = Read-Host "$prompt [default: $default]"
+        if ([string]::IsNullOrWhiteSpace($val)) { return $default }
+        return $val
     }
     return Read-Host $prompt
 }
 
-# Server IP avtomatik aniqlash
+# Detect public IP
 try {
     $ServerPublicIp = (Invoke-RestMethod -Uri "https://api.ipify.org" -TimeoutSec 5)
 } catch {
-    $ServerPublicIp = Read-SecretLine "Server'ning public IP manzilini kiriting"
+    $ServerPublicIp = Read-Host "Could not auto-detect public IP. Enter server IP"
 }
-Write-Host "Aniqlangan server IP: $ServerPublicIp" -ForegroundColor Yellow
+Write-Host "Server public IP: $ServerPublicIp" -ForegroundColor Yellow
 
-# Parollarni interaktiv so'rash
+# Ask for passwords
 Write-Host ""
-Write-Host "----- PAROLLAR SO'ROVI -----" -ForegroundColor Yellow
-$MysqlRootPass = Read-SecretLine "Yangi MySQL root paroli (kamida 12 belgi)"
+Write-Host "----- PASSWORDS -----" -ForegroundColor Yellow
+$MysqlRootPass = Read-Host "New MySQL root password (min 8 chars)"
 if ($MysqlRootPass.Length -lt 8) {
-    throw "Parol juda qisqa. Kamida 8 belgi kerak."
+    throw "Password too short (min 8 chars)."
 }
+$AdminEmail    = Read-WithDefault "Admin email"             "developer@gmail.com"
+$AdminPassword = Read-Host        "Admin password (for site login)"
+$AdminName     = Read-WithDefault "Admin display name"      "Developer"
 
-$AdminEmail    = Read-SecretLine "Admin email"             "developer@gmail.com"
-$AdminPassword = Read-SecretLine "Admin paroli (saytga kirish uchun)"
-$AdminName     = Read-SecretLine "Admin ismi"              "Developer"
-
-# JWT secret avtomatik generatsiya
+# Auto-generate JWT secret
 $JwtSecret = -join ((1..64) | ForEach-Object { '{0:x}' -f (Get-Random -Maximum 16) })
 
-# Domain (agar hali yo'q bo'lsa, IP ishlatamiz)
 $ClientOrigin = "http://${ServerPublicIp}:3000"
 $AdminOrigin  = "http://${ServerPublicIp}:3001"
 $PublicApiUrl = "http://${ServerPublicIp}:4000"
 
-# ================================================================
-# 2. CHOCOLATEY
-# ================================================================
-Write-Step "Chocolatey..."
+# ----- 1. Chocolatey -----
+Write-Step "Installing Chocolatey..."
 if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
     Set-ExecutionPolicy Bypass -Scope Process -Force
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
@@ -83,42 +62,35 @@ if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 }
 
-# ================================================================
-# 3. NODE.JS, GIT, MYSQL
-# ================================================================
-Write-Step "Node.js 20 LTS, Git, MySQL 8 o'rnatish..."
+# ----- 2. Node.js, Git, MySQL -----
+Write-Step "Installing Node.js 20 LTS, Git, MySQL 8..."
 choco install -y nodejs-lts git
 choco install -y mysql --params "/Port:3306"
 
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
-Write-Step "PM2 o'rnatish..."
+Write-Step "Installing PM2..."
 npm install -g pm2 pm2-windows-startup
 pm2-startup install
 
-# ================================================================
-# 4. MYSQL PAROL O'RNATISH
-# ================================================================
-Write-Step "MySQL root parolini o'rnatish..."
+# ----- 3. Set MySQL root password -----
+Write-Step "Setting MySQL root password..."
 $mysqlBin = (Get-Command mysql.exe -ErrorAction SilentlyContinue).Source
 if (-not $mysqlBin) {
     $mysqlBin = "C:\tools\mysql\current\bin\mysql.exe"
 }
 if (Test-Path $mysqlBin) {
-    # Avval parolsiz urinish (toza o'rnatishda)
     try {
         & $mysqlBin -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '$MysqlRootPass'; FLUSH PRIVILEGES;"
     } catch {
-        Write-Host "MySQL'ga parolsiz kirish mumkin emas — parol allaqachon o'rnatilgan deb hisoblaymiz." -ForegroundColor Yellow
+        Write-Host "Could not set MySQL password (it may already be set). Continuing." -ForegroundColor Yellow
     }
 }
 
-# ================================================================
-# 5. REPO
-# ================================================================
-Write-Step "Repo klonlash..."
+# ----- 4. Clone repo -----
+Write-Step "Cloning repo..."
 if (Test-Path $AppRoot) {
-    Write-Host "Repo allaqachon mavjud — git pull..."
+    Write-Host "Repo already exists, pulling latest..."
     Set-Location $AppRoot
     git pull
 } else {
@@ -126,10 +98,8 @@ if (Test-Path $AppRoot) {
     Set-Location $AppRoot
 }
 
-# ================================================================
-# 6. .ENV FAYLLAR
-# ================================================================
-Write-Step ".env fayllarni yaratish..."
+# ----- 5. Write .env files -----
+Write-Step "Writing .env files..."
 
 $backendEnv = @"
 PORT=4000
@@ -159,34 +129,28 @@ $frontEnv = "NEXT_PUBLIC_API_BASE_URL=$PublicApiUrl`n"
 Set-Content -Path "$AppRoot\client-site\.env.production" -Value $frontEnv -Encoding utf8
 Set-Content -Path "$AppRoot\admin-site\.env.production"  -Value $frontEnv -Encoding utf8
 
-# ================================================================
-# 7. DEPENDENCIES + BUILD
-# ================================================================
-Write-Step "Backend dependencies..."
+# ----- 6. Dependencies + build -----
+Write-Step "Backend npm ci..."
 Set-Location "$AppRoot\backend"
 npm ci --omit=dev
 
-Write-Step "Client-site dependencies + build..."
+Write-Step "Client-site npm ci + build..."
 Set-Location "$AppRoot\client-site"
 npm ci
 npm run build
 
-Write-Step "Admin-site dependencies + build..."
+Write-Step "Admin-site npm ci + build..."
 Set-Location "$AppRoot\admin-site"
 npm ci
 npm run build
 
-# ================================================================
-# 8. DATABASE
-# ================================================================
-Write-Step "Database yaratish + seed..."
+# ----- 7. DB seed -----
+Write-Step "Creating DB + seeding..."
 Set-Location "$AppRoot\backend"
 npm run db:reset
 
-# ================================================================
-# 9. PM2
-# ================================================================
-Write-Step "PM2 servislarni ishga tushirish..."
+# ----- 8. PM2 -----
+Write-Step "Starting services with PM2..."
 Set-Location $AppRoot
 
 pm2 delete all 2>$null
@@ -197,31 +161,26 @@ pm2 start "npm" --name sodiq-admin   --cwd "$AppRoot\admin-site"  -- start
 
 pm2 save
 
-# ================================================================
-# 10. FIREWALL
-# ================================================================
-Write-Step "Firewall portlarini ochish..."
-New-NetFirewallRule -DisplayName "Sodiq Client (3000)"  -Direction Inbound -Action Allow -Protocol TCP -LocalPort 3000 -ErrorAction SilentlyContinue | Out-Null
-New-NetFirewallRule -DisplayName "Sodiq Admin (3001)"   -Direction Inbound -Action Allow -Protocol TCP -LocalPort 3001 -ErrorAction SilentlyContinue | Out-Null
-New-NetFirewallRule -DisplayName "Sodiq Backend (4000)" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 4000 -ErrorAction SilentlyContinue | Out-Null
+# ----- 9. Firewall -----
+Write-Step "Opening firewall ports..."
+New-NetFirewallRule -DisplayName "Sodiq Client 3000"  -Direction Inbound -Action Allow -Protocol TCP -LocalPort 3000 -ErrorAction SilentlyContinue | Out-Null
+New-NetFirewallRule -DisplayName "Sodiq Admin 3001"   -Direction Inbound -Action Allow -Protocol TCP -LocalPort 3001 -ErrorAction SilentlyContinue | Out-Null
+New-NetFirewallRule -DisplayName "Sodiq Backend 4000" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 4000 -ErrorAction SilentlyContinue | Out-Null
 
-# ================================================================
-# 11. NATIJA
-# ================================================================
+# ----- 10. Done -----
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green
-Write-Host " DEPLOY YAKUNLANDI" -ForegroundColor Green
+Write-Host " DEPLOY COMPLETE" -ForegroundColor Green
 Write-Host "============================================================" -ForegroundColor Green
 Write-Host ""
-Write-Host " Client sayt :  http://${ServerPublicIp}:3000"
+Write-Host " Client site :  http://${ServerPublicIp}:3000"
 Write-Host " Admin panel :  http://${ServerPublicIp}:3001/login"
 Write-Host " Backend API :  http://${ServerPublicIp}:4000"
 Write-Host ""
 Write-Host " Admin login :  $AdminEmail"
 Write-Host ""
-Write-Host " PM2 status:  pm2 status"
-Write-Host " Loglar    :  pm2 logs"
-Write-Host " Restart   :  pm2 restart all"
+Write-Host " PM2 status :  pm2 status"
+Write-Host " PM2 logs   :  pm2 logs"
+Write-Host " Restart    :  pm2 restart all"
 Write-Host ""
-Write-Host " Production .env: $AppRoot\backend\.env (parol va JWT secret saqlanadi)"
 Write-Host "============================================================" -ForegroundColor Green

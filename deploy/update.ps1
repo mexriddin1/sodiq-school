@@ -1,8 +1,6 @@
 #requires -RunAsAdministrator
-<#
-    Sodiq School — yangilash skripti (kodda o'zgarish bo'lgandan keyin)
-    Serverda ishlatish: C:\sodiq-school\deploy\update.ps1
-#>
+# Sodiq School - update script (run after code changes pushed to GitHub)
+# Usage on server: C:\sodiq-school\deploy\update.ps1
 
 $ErrorActionPreference = "Stop"
 $AppRoot = "C:\sodiq-school"
@@ -12,11 +10,11 @@ function Write-Step($msg) {
     Write-Host "==> $msg" -ForegroundColor Cyan
 }
 
-Write-Step "GitHub'dan eng yangi kodni olish..."
+Write-Step "Pulling latest from GitHub..."
 Set-Location $AppRoot
 git pull
 
-Write-Step "Backend dependencies (agar package.json o'zgargan bo'lsa)..."
+Write-Step "Backend deps..."
 Set-Location "$AppRoot\backend"
 npm ci --omit=dev
 
@@ -30,12 +28,12 @@ Set-Location "$AppRoot\admin-site"
 npm ci
 npm run build
 
-Write-Step "PM2 servislarni qayta ishga tushirish..."
+Write-Step "Restarting PM2..."
 pm2 restart all
 pm2 save
 
 Write-Host ""
 Write-Host "============================================================" -ForegroundColor Green
-Write-Host " YANGILANDI — pm2 status orqali tekshiring" -ForegroundColor Green
+Write-Host " UPDATED" -ForegroundColor Green
 Write-Host "============================================================" -ForegroundColor Green
 pm2 status
