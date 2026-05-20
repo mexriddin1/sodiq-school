@@ -39,10 +39,10 @@ ok "Server IP: ${SERVER_IP}"
 
 # ---------- 1. Generate passwords ----------
 step "Generating passwords and secrets..."
-gen_pw() { tr -dc 'A-Za-z0-9' </dev/urandom | head -c "${1:-20}"; }
-MYSQL_ROOT_PASS="$(gen_pw 24)"
-ADMIN_PASSWORD="$(gen_pw 16)"
-JWT_SECRET="$(openssl rand -hex 32 2>/dev/null || gen_pw 64)"
+# Use openssl to avoid SIGPIPE issues with `tr | head` under `set -o pipefail`.
+MYSQL_ROOT_PASS="$(openssl rand -hex 12)"   # 24 hex chars
+ADMIN_PASSWORD="$(openssl rand -hex 8)"     # 16 hex chars
+JWT_SECRET="$(openssl rand -hex 32)"        # 64 hex chars
 ADMIN_EMAIL="${ADMIN_EMAIL:-$ADMIN_EMAIL_DEFAULT}"
 ADMIN_NAME="${ADMIN_NAME:-$ADMIN_NAME_DEFAULT}"
 
