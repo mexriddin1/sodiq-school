@@ -128,14 +128,25 @@ printf 'NEXT_PUBLIC_API_BASE_URL=%s\n' "${PUBLIC_API_URL}" > "${APP_ROOT}/client
 printf 'NEXT_PUBLIC_API_BASE_URL=%s\n' "${PUBLIC_API_URL}" > "${APP_ROOT}/admin-site/.env.production"
 
 # ---------- 8. Install dependencies + build ----------
+# npm ci is strict about package-lock vs package.json sync. If the lock
+# is stale (common during fast iteration), fall back to npm install.
+npm_install() {
+  if ! npm ci $1; then
+    warn "npm ci failed (lock out of sync?), falling back to npm install"
+    npm install $1
+  fi
+}
+export -f npm_install warn
+export c_yellow c_off
+
 step "Backend: npm ci..."
-( cd "${APP_ROOT}/backend"     && npm ci --omit=dev )
+( cd "${APP_ROOT}/backend"     && npm_install "--omit=dev" )
 
 step "Client-site: npm ci + build..."
-( cd "${APP_ROOT}/client-site" && npm ci && npm run build )
+( cd "${APP_ROOT}/client-site" && npm_install "" && npm run build )
 
 step "Admin-site: npm ci + build..."
-( cd "${APP_ROOT}/admin-site"  && npm ci && npm run build )
+( cd "${APP_ROOT}/admin-site"  && npm_install "" && npm run build )
 
 # ---------- 9. DB migrate + seed ----------
 step "Migrating + seeding database..."
