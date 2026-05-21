@@ -124,10 +124,21 @@ PUBLIC_BASE_URL=${PUBLIC_API_URL}
 EOF
 chmod 600 "${APP_ROOT}/backend/.env"
 
-printf 'NEXT_PUBLIC_API_BASE_URL=%s\n' "${PUBLIC_API_URL}" > "${APP_ROOT}/client-site/.env.production"
-printf 'NEXT_PUBLIC_API_BASE_URL=%s\n' "${PUBLIC_API_URL}" > "${APP_ROOT}/admin-site/.env.production"
+INTERNAL_API_URL="http://127.0.0.1:4000"
 
-# ---------- 8. Install dependencies + build ----------
+# client-site/src/lib/api.ts uses INTERNAL_API_BASE_URL during SSR/build to hit
+# the backend over loopback, avoiding ECONNREFUSED on the public IP during
+# prerender. NEXT_PUBLIC_API_BASE_URL is what gets baked into browser bundles.
+cat > "${APP_ROOT}/client-site/.env.production" <<EOF
+NEXT_PUBLIC_API_BASE_URL=${PUBLIC_API_URL}
+INTERNAL_API_BASE_URL=${INTERNAL_API_URL}
+EOF
+cat > "${APP_ROOT}/admin-site/.env.production" <<EOF
+NEXT_PUBLIC_API_BASE_URL=${PUBLIC_API_URL}
+INTERNAL_API_BASE_URL=${INTERNAL_API_URL}
+EOF
+
+# ---------- 8. Install dependencies ----------
 # npm ci is strict about package-lock vs package.json sync. If the lock
 # is stale (common during fast iteration), fall back to npm install.
 npm_install() {
@@ -142,24 +153,43 @@ export c_yellow c_off
 step "Backend: npm ci..."
 ( cd "${APP_ROOT}/backend"     && npm_install "--omit=dev" )
 
-step "Client-site: npm ci + build..."
-( cd "${APP_ROOT}/client-site" && npm_install "" && npm run build )
+step "Client-site: npm install..."
+( cd "${APP_ROOT}/client-site" && npm_install "" )
 
-step "Admin-site: npm ci + build..."
-( cd "${APP_ROOT}/admin-site"  && npm_install "" && npm run build )
+step "Admin-site: npm install..."
+( cd "${APP_ROOT}/admin-site"  && npm_install "" )
 
-# ---------- 9. DB migrate + seed ----------
+# ---------- 9. DB migrate + seed + start backend ----------
 step "Migrating + seeding database..."
 ( cd "${APP_ROOT}/backend" && npm run db:reset )
 
-# ---------- 10. PM2 ----------
-step "Starting services with PM2..."
-cd "${APP_ROOT}"
+step "Starting backend with PM2 (needed before Next.js prerender)..."
 pm2 delete all >/dev/null 2>&1 || true
+pm2 start npm --name sodiq-backend --cwd "${APP_ROOT}/backend" -- start
 
-pm2 start npm --name sodiq-backend --cwd "${APP_ROOT}/backend"     -- start
-pm2 start npm --name sodiq-client  --cwd "${APP_ROOT}/client-site" -- start
-pm2 start npm --name sodiq-admin   --cwd "${APP_ROOT}/admin-site"  -- start
+step "Waiting for backend on ${INTERNAL_API_URL}..."
+for i in $(seq 1 60); do
+  if curl -fsS -o /dev/null --max-time 2 "${INTERNAL_API_URL}/" \
+     || curl -fsS -o /dev/null --max-time 2 "${INTERNAL_API_URL}/health" \
+     || curl -fsS -o /dev/null --max-time 2 "${INTERNAL_API_URL}/api/health"; then
+    ok "Backend reachable after ${i}s"
+    break
+  fi
+  sleep 1
+  [[ $i -eq 60 ]] && { pm2 logs sodiq-backend --lines 50 --nostream || true; die "Backend did not come up"; }
+done
+
+# ---------- 10. Build front-ends (now backend is live for prerender) ----------
+step "Client-site: build..."
+( cd "${APP_ROOT}/client-site" && npm run build )
+
+step "Admin-site: build..."
+( cd "${APP_ROOT}/admin-site" && npm run build )
+
+# ---------- 11. PM2: start front-ends ----------
+step "Starting client + admin with PM2..."
+pm2 start npm --name sodiq-client --cwd "${APP_ROOT}/client-site" -- start
+pm2 start npm --name sodiq-admin  --cwd "${APP_ROOT}/admin-site"  -- start
 
 pm2 save
 
