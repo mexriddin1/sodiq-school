@@ -2,5 +2,9 @@ node_modules
 .env
 uploads/*
 !uploads/.gitkeep
+# Track seed images so fresh deploys have them out of the box.
+# User-uploaded files (uploads/<other-subdirs>) remain ignored.
+!uploads/seed/
+uploads/seed/**/.DS_Store
 *.log
 .DS_Store
