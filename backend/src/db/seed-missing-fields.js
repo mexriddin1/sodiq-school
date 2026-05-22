@@ -38,6 +38,38 @@ const settings = [
     ru: 'Важная информация',
     en: 'Key information',
   },
+
+  // Admissions — 3 exam test cards
+  { key: 'admissions.test1_name', group: 'admissions',
+    uz: 'Matematika', ru: 'Математика', en: 'Mathematics' },
+  { key: 'admissions.test1_sub', group: 'admissions',
+    uz: 'Mantiq va hisoblash', ru: 'Логика и вычисления', en: 'Logic and arithmetic' },
+  { key: 'admissions.test2_name', group: 'admissions',
+    uz: 'Tanqidiy fikrlash', ru: 'Критическое мышление', en: 'Critical thinking' },
+  { key: 'admissions.test2_sub', group: 'admissions',
+    uz: 'Tahlil va mushohada', ru: 'Анализ и рассуждение', en: 'Analysis and reasoning' },
+  { key: 'admissions.test3_name', group: 'admissions',
+    uz: 'Ingliz tili', ru: 'Английский язык', en: 'English' },
+  { key: 'admissions.test3_sub', group: 'admissions',
+    uz: 'Grammar va reading', ru: 'Грамматика и чтение', en: 'Grammar and reading' },
+
+  // Admissions — 4 info items (label / value)
+  { key: 'admissions.info1_label', group: 'admissions',
+    uz: 'Qabul sinflari', ru: 'Классы для поступления', en: 'Grades accepted' },
+  { key: 'admissions.info1_value', group: 'admissions',
+    uz: '7 – 11 sinf', ru: '7 – 11 класс', en: 'Grades 7 – 11' },
+  { key: 'admissions.info2_label', group: 'admissions',
+    uz: 'Har sinfda joy', ru: 'Мест в классе', en: 'Seats per class' },
+  { key: 'admissions.info2_value', group: 'admissions',
+    uz: '20 ta o\'rin', ru: '20 мест', en: '20 seats' },
+  { key: 'admissions.info3_label', group: 'admissions',
+    uz: 'Imtihon davomiyligi', ru: 'Длительность экзамена', en: 'Exam duration' },
+  { key: 'admissions.info3_value', group: 'admissions',
+    uz: '2 soat', ru: '2 часа', en: '2 hours' },
+  { key: 'admissions.info4_label', group: 'admissions',
+    uz: 'Grant imkoniyati', ru: 'Возможность гранта', en: 'Grant available' },
+  { key: 'admissions.info4_value', group: 'admissions',
+    uz: '100% gacha', ru: 'До 100%', en: 'Up to 100%' },
 ];
 
 const resultsStats = [
