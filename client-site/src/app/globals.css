@@ -289,9 +289,9 @@ p  { font-size: 1rem; }
   background: radial-gradient(circle, rgba(255,138,50,0.08) 0%, transparent 60%);
   pointer-events: none;
 }
-.hero-inner { position: relative; z-index: 2; text-align: center; }
+.hero-inner { position: relative; z-index: 2; text-align: left; }
 .hero h1 {
-  margin: 24px auto 20px;
+  margin: 24px 0 20px;
   max-width: 18ch;
   text-wrap: balance;
 }
@@ -300,9 +300,9 @@ p  { font-size: 1rem; }
   font-size: clamp(1rem, 1.4vw, 1.18rem);
   max-width: 56ch;
   line-height: 1.6;
-  margin: 0 auto 40px;
+  margin: 0 0 40px;
 }
-.hero-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 24px; margin-bottom: 64px; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 24px; margin-bottom: 64px; }
 .hero-actions .text-link.on-dark {
   border: none;
   border-bottom: 1px solid rgba(255,255,255,0.3);
