@@ -82,8 +82,26 @@ function init() {
       },
       { threshold: 0.15, rootMargin: '0px 0px -40px 0px' },
     );
+    const finalText = (el: HTMLElement): string | null => {
+      const raw = el.dataset.target || '0';
+      const target = parseFloat(raw);
+      if (!isFinite(target)) return null;
+      const decimals = raw.includes('.') ? (raw.split('.')[1]?.length || 0) : 0;
+      return decimals ? target.toFixed(decimals) : Math.round(target).toString();
+    };
     counters.forEach((c) => {
       c.dataset.cuInit = '1';
+      // Elements already in the viewport at page-load skip the count-up
+      // animation entirely and just render the final number. This avoids
+      // showing "0" when the count-up animation never fires (e.g. JS
+      // disabled, IntersectionObserver edge cases, prerendered above-fold).
+      const rect = c.getBoundingClientRect();
+      const inViewport = rect.top < window.innerHeight && rect.bottom > 0;
+      if (inViewport) {
+        const txt = finalText(c);
+        if (txt !== null) c.textContent = txt;
+        return;
+      }
       cuObserver.observe(c);
     });
   }
