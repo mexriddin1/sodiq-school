@@ -3971,11 +3971,12 @@ a.cta-info-value:hover { color: var(--orange); }
 
 /* Price amount — navy → orange brand gradient text */
 .pricing-amount {
-  font-size: clamp(2.8rem, 5.5vw, 4rem);
+  font-size: 1.75rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
   margin-bottom: 6px;
+  white-space: nowrap;
   background: linear-gradient(135deg,
     var(--navy) 0%,
     #1a2b6e 50%,
@@ -3984,13 +3985,16 @@ a.cta-info-value:hover { color: var(--orange); }
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+@media (min-width: 1280px) {
+  .pricing-amount { font-size: 2rem; }
+}
 .pricing-amount span {
-  font-size: 0.42em;
+  font-size: 0.55em;
   font-weight: 600;
   color: var(--navy-70);
   -webkit-text-fill-color: var(--navy-70);
   margin-left: 6px;
-  vertical-align: 0.25em;
+  vertical-align: 0.15em;
 }
 
 .pricing-note {
