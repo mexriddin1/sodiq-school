@@ -18,12 +18,18 @@ import { seedTestimonialVideos } from './seed-data/testimonial-videos.js';
 import { seedMedia } from './seed-data/media.js';
 import { seedCarousel } from './seed-data/carousel.js';
 import { seedExamCourseSections } from './seed-data/exam-course-sections.js';
+import { seedPricingPlans } from './seed-data/pricing-plans.js';
+import { seedAdvantages } from './seed-data/advantages.js';
+import { seedAboutStats } from './seed-data/about-stats.js';
 
 async function clearTables() {
   console.log('[seed] clearing data...');
   const tables = [
     'application_submissions',
     'exam_course_section_translations', 'exam_course_sections',
+    'pricing_plan_translations', 'pricing_plans',
+    'advantage_translations', 'advantages',
+    'about_stat_translations', 'about_stats',
     'carousel_images',
     'faq_translations', 'faqs',
     'gallery_translations', 'gallery_items',
@@ -81,6 +87,9 @@ async function run() {
   await seedGallery();
   await seedFaqs();
   await seedCarousel(mediaMap);
+  await seedPricingPlans();
+  await seedAdvantages();
+  await seedAboutStats();
   console.log('[seed] done');
   await pool.end();
 }
