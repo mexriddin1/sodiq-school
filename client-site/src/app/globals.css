@@ -299,10 +299,10 @@ p  { font-size: 1rem; }
 .hero h1 {
   font-size: clamp(1.8rem, 3.6vw, 2.9rem);
   margin: 20px 0 16px;
-  max-width: 18ch;
-  text-wrap: balance;
+  max-width: 22ch;
   line-height: 1.15;
 }
+.hero h1 .accent { display: block; }
 .hero p.lead {
   color: rgba(255,255,255,0.72);
   font-size: clamp(0.95rem, 1.2vw, 1.05rem);
