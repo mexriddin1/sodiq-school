@@ -310,7 +310,7 @@ p  { font-size: 1rem; }
 }
 .hero-inner { position: relative; z-index: 2; text-align: left; }
 .hero h1 {
-  font-size: clamp(1.8rem, 3.6vw, 2.9rem);
+  font-size: clamp(2.25rem, 4.5vw, 3.6rem);
   margin: 20px 0 16px;
   max-width: 22ch;
   line-height: 1.15;
