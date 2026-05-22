@@ -2648,15 +2648,16 @@ a.cta-info-value:hover { color: var(--orange); }
   margin-bottom: 24px;
 }
 .pricing-amount {
-  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-size: clamp(1.75rem, 3.2vw, 2.4rem);
   font-weight: 800;
   color: var(--navy);
   letter-spacing: -0.02em;
-  line-height: 1;
+  line-height: 1.1;
   margin-bottom: 8px;
+  white-space: nowrap;
 }
 .pricing-amount span {
-  font-size: 0.5em;
+  font-size: 0.55em;
   font-weight: 600;
   color: var(--navy-70);
 }
