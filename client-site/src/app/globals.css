@@ -297,16 +297,18 @@ p  { font-size: 1rem; }
 }
 .hero-inner { position: relative; z-index: 2; text-align: left; }
 .hero h1 {
-  margin: 24px 0 20px;
+  font-size: clamp(1.8rem, 3.6vw, 2.9rem);
+  margin: 20px 0 16px;
   max-width: 18ch;
   text-wrap: balance;
+  line-height: 1.15;
 }
 .hero p.lead {
   color: rgba(255,255,255,0.72);
-  font-size: clamp(1rem, 1.4vw, 1.18rem);
+  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
   max-width: 56ch;
-  line-height: 1.6;
-  margin: 0 0 40px;
+  line-height: 1.55;
+  margin: 0 0 32px;
 }
 .hero-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 24px; margin-bottom: 64px; }
 .hero-actions .text-link.on-dark {
