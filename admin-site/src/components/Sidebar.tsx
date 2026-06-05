@@ -42,6 +42,7 @@ const NAV = [
   ]},
   { section: 'Tizim', items: [
     { href: '/users', label: 'Foydalanuvchilar' },
+    { href: '/webhooks', label: 'Webhooklar (lead forward)' },
   ]},
 ];
 

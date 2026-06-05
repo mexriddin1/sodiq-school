@@ -3,7 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import swaggerUi from 'swagger-ui-express';
 import { env } from './config/env.js';
+import { openapiSpec } from './docs/openapi.js';
 import { errorHandler } from './middleware/errors.js';
 import authRouter from './routes/auth.js';
 import usersRouter from './routes/users.js';
@@ -30,6 +32,7 @@ import publicSiteRouter from './routes/public-site.js';
 import mediaRouter from './routes/media.js';
 import carouselRouter from './routes/carousel.js';
 import examCourseSectionsRouter from './routes/exam-course-sections.js';
+import webhooksRouter from './routes/webhooks.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -46,6 +49,13 @@ const uploadsAbs = path.resolve(__dirname, '..', env.uploadDir);
 app.use('/uploads', express.static(uploadsAbs));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
+
+// Swagger / OpenAPI docs
+app.get('/api/docs.json', (_req, res) => res.json(openapiSpec));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openapiSpec, {
+  customSiteTitle: 'Sodiq School API',
+  swaggerOptions: { persistAuthorization: true },
+}));
 
 // Auth & users (admin)
 app.use('/api/auth', authRouter);
@@ -76,6 +86,7 @@ app.use('/api/faqs', faqsRouter);
 app.use('/api/applications', applicationsRouter);
 app.use('/api/carousel', carouselRouter);
 app.use('/api/exam-course-sections', examCourseSectionsRouter);
+app.use('/api/webhooks', webhooksRouter);
 
 // Convenience aggregator endpoint that returns the entire site bundle for one locale.
 app.use('/api/public-site', publicSiteRouter);

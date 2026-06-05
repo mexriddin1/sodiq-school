@@ -5,6 +5,8 @@
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS webhook_deliveries;
+DROP TABLE IF EXISTS webhooks;
 DROP TABLE IF EXISTS application_submissions;
 DROP TABLE IF EXISTS exam_course_section_translations;
 DROP TABLE IF EXISTS exam_course_sections;
@@ -216,6 +218,7 @@ CREATE TABLE awards (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   icon_key VARCHAR(50) DEFAULT 'trophy',
   image_id INT UNSIGNED,
+  video_url VARCHAR(500),
   gold_count INT DEFAULT 0,
   silver_count INT DEFAULT 0,
   bronze_count INT DEFAULT 0,
@@ -482,9 +485,59 @@ CREATE TABLE application_submissions (
   phone VARCHAR(40) NOT NULL,
   message TEXT,
   grade VARCHAR(20),
+  region VARCHAR(120),
   status ENUM('new','contacted','closed') NOT NULL DEFAULT 'new',
   notes TEXT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- WEBHOOKS (forward lead/form submissions to external URLs)
+-- selected_fields_json: JSON array of field names from the lead payload
+-- payload_template: optional JSON template with {{field}} placeholders.
+--   If null/empty, selected fields are sent as a flat JSON object.
+-- custom_headers_json: extra HTTP headers (object)
+-- secret: when set, HMAC-SHA256 of body is sent as X-Webhook-Signature
+-- ============================================================
+CREATE TABLE webhooks (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  url VARCHAR(1000) NOT NULL,
+  method ENUM('POST','PUT','PATCH') NOT NULL DEFAULT 'POST',
+  secret VARCHAR(255),
+  event_types_json JSON,
+  selected_fields_json JSON,
+  custom_headers_json JSON,
+  payload_template MEDIUMTEXT,
+  include_metadata TINYINT(1) NOT NULL DEFAULT 1,
+  retry_count TINYINT UNSIGNED NOT NULL DEFAULT 3,
+  timeout_ms INT UNSIGNED NOT NULL DEFAULT 10000,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  is_archived TINYINT(1) NOT NULL DEFAULT 0,
+  archived_at DATETIME NULL,
+  last_success_at DATETIME NULL,
+  last_error_at DATETIME NULL,
+  last_error TEXT,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_webhooks_active (is_active, is_archived)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE webhook_deliveries (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  webhook_id INT UNSIGNED NOT NULL,
+  event_type VARCHAR(80) NOT NULL,
+  target_url VARCHAR(1000) NOT NULL,
+  request_body MEDIUMTEXT,
+  response_status INT,
+  response_body MEDIUMTEXT,
+  error TEXT,
+  attempts TINYINT UNSIGNED NOT NULL DEFAULT 1,
+  duration_ms INT UNSIGNED,
+  success TINYINT(1) NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_wd_webhook (webhook_id, created_at),
+  FOREIGN KEY (webhook_id) REFERENCES webhooks(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
