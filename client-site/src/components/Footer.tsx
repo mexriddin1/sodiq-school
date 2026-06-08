@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { Locale } from '@/i18n/config';
 import { getDict } from '@/i18n/dictionaries';
+import { splitContactAddresses } from '@/lib/contact';
 import { Logo } from './Logo';
 
 export function Footer({ locale, settings }: { locale: Locale; settings: Record<string, string> }) {
@@ -11,12 +12,14 @@ export function Footer({ locale, settings }: { locale: Locale; settings: Record<
   const ig = settings['contact.instagram'] || 'https://instagram.com/sodiqschool.uz';
   const yt = settings['contact.youtube'] || 'https://youtube.com/@sodiq_school';
   const desc = settings['brand.description'] || '';
+  const addresses = splitContactAddresses(settings['contact.address']);
+  const primaryAddress = addresses[0];
   const copy = settings['footer.copyright'] || '© 2025 Sodiq School.';
   return (
     <footer className="footer">
       <div className="container">
         <div className="footer-inner">
-          <div>
+          <div className="footer-brand">
             <Logo
               locale={locale}
               variant="footer"
@@ -38,6 +41,14 @@ export function Footer({ locale, settings }: { locale: Locale; settings: Record<
               <span className="phone-lbl">{dict.sections.apply_label_phone}</span>
               <div className="phone"><a href={`tel:${phoneLink}`}>{phone}</a></div>
             </div>
+            {primaryAddress && (
+              <div className="footer-addresses">
+                <span className="phone-lbl">{dict.sections.address_label || 'Manzil'}</span>
+                <div className="footer-address-list">
+                  <span className="footer-address-text">{primaryAddress}</span>
+                </div>
+              </div>
+            )}
             <div className="socials">
               <a href={tg} className="social-btn" aria-label="Telegram">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.5 4.5L2.5 12l5.5 2 2 6 3-3.5 5 4 3.5-16zm-4.7 4.2l-7.5 6.8-1.2-3.7 8.7-3.1z"/></svg>
