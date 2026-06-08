@@ -5,10 +5,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Sodiq School",
   description: "Toshkentdagi yetakchi xususiy maktab",
+  verification: {
+    google: "bdJsJORhzTgyLoOw27C1XX8tw1iGdUrszCEpJIS0DuE",
+  },
 };
 
-// The root layout. We render <html lang="uz"> by default; the per-locale layout
-// updates the lang attribute on the client.
 export default function RootLayout({
   children,
 }: {
@@ -39,6 +40,18 @@ export default function RootLayout({
             gtag('js', new Date());
 
             gtag('config', 'G-NR8E2NB2L8');
+
+            // Telefon raqamlarini kuzatish
+            document.addEventListener("click", function(e) {
+              const link = e.target.closest('a[href^="tel:"]');
+              if (link && typeof gtag === 'function') {
+                gtag('event', 'phone_click', {
+                  'event_category': 'Contact',
+                  'event_label': link.href,
+                  'transport_type': 'beacon'
+                });
+              }
+            });
           `}
         </Script>
       </head>
