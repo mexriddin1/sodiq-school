@@ -5,11 +5,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Sodiq School",
   description: "Toshkentdagi yetakchi xususiy maktab",
-  verification: {
-    google: "bdJsJORhzTgyLoOw27C1XX8tw1iGdUrszCEpJIS0DuE",
-  },
 };
 
+// The root layout. We render <html lang="uz"> by default; the per-locale layout
+// updates the lang attribute on the client.
 export default function RootLayout({
   children,
 }: {
@@ -18,6 +17,10 @@ export default function RootLayout({
   return (
     <html lang="uz">
       <head>
+        <meta
+          name="google-site-verification"
+          content="bdJsJORhzTgyLoOw27C1XX8tw1iGdUrszCEpJIS0DuE"
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
