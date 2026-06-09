@@ -1,23 +1,135 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import type { Locale } from '@/i18n/config';
-import { isLocale } from '@/i18n/config';
-import { getDict } from '@/i18n/dictionaries';
-import { fetchSiteBundle, resolveMediaUrl, API_BASE } from '@/lib/api';
-import { PageHero } from '@/components/PageHero';
-import { TestimonialVideos } from '@/components/TestimonialVideos';
-import { CtaBanner } from '@/components/CtaBanner';
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import type { Locale } from "@/i18n/config";
+import { isLocale, LOCALES } from "@/i18n/config"; // LOCALES qo'shildi
+import { getDict } from "@/i18n/dictionaries";
+import { fetchSiteBundle, resolveMediaUrl, API_BASE } from "@/lib/api";
+import { PageHero } from "@/components/PageHero";
+import { TestimonialVideos } from "@/components/TestimonialVideos";
+import { CtaBanner } from "@/components/CtaBanner";
 
-export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
-  if (!isLocale(params.locale)) return {};
-  const dict = getDict(params.locale as Locale);
-  return { title: dict.meta.about_title, description: dict.meta.about_desc };
+// 1. "Haqida" sahifasi uchun maxsus ko'p tilli SEO bazasi
+const aboutSeoData: Record<
+  string,
+  { title: string; description: string; keywords: string[] }
+> = {
+  uz: {
+    title: "Sodiq School Haqida – Xalqaro Taʼlim Standartlari va Maqsadlar",
+    description:
+      "Sodiq School xususiy maktabi haqida. Bizning maqsadimiz – oʻquvchilarni xorijda oʻqish va dunyoning eng nufuzli chet el universitetlariga tayyorlashdir.",
+    keywords: [
+      "sodiq school haqida",
+      "xalqaro ta'lim",
+      "chet elda o'qish",
+      "xorijiy universitetlarga tayyorlov",
+      "toshkent xususiy maktablari",
+      "maktab qadriyatlari",
+    ],
+  },
+  ru: {
+    title: "О школе Sodiq School – Международное Образование в Ташкенте",
+    description:
+      "Подробно о частной школе Sodiq School. Наша миссия — качественное обучение за рубежом, поступление в зарубежные вузы и подготовка к топ-университетам.",
+    keywords: [
+      "о школе sodiq school",
+      "обучение за рубежом",
+      "зарубежные вузы",
+      "учеба за границей",
+      "поступление за границу",
+      "образование за рубежом",
+      "подготовка в иностранный университет",
+    ],
+  },
+  en: {
+    title: "About Sodiq School – Elite International High School Tashkent",
+    description:
+      "Learn about Sodiq School. Discover our values, high academic standards, and professional preparation for admission to top international universities.",
+    keywords: [
+      "about sodiq school",
+      "study abroad preparation",
+      "foreign universities",
+      "international education tashkent",
+      "elite high school",
+      "academic excellence uzbekistan",
+    ],
+  },
+};
+
+// 2. Next.js 15 versiyasi bilan ham 100% xavfsiz va mukammal SEO funksiyasi
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }> | { locale: string };
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  if (!isLocale(resolvedParams.locale)) return {};
+
+  const locale = resolvedParams.locale || "uz";
+  const currentSeo = aboutSeoData[locale] || aboutSeoData.uz;
+
+  const baseUrl = "https://sodiqschool.uz/uz";
+  const currentUrl = `${baseUrl}/${locale}/about`;
+
+  return {
+    title: currentSeo.title,
+    description: currentSeo.description,
+    keywords: currentSeo.keywords,
+
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+      },
+    },
+
+    alternates: {
+      canonical: currentUrl,
+      languages: {
+        "uz-UZ": `${baseUrl}/uz/about`,
+        "ru-RU": `${baseUrl}/ru/about`,
+        "en-US": `${baseUrl}/en/about`,
+      },
+    },
+
+    openGraph: {
+      title: currentSeo.title,
+      description: currentSeo.description,
+      url: currentUrl,
+      siteName: "Sodiq School",
+      type: "website",
+      locale: locale === "uz" ? "uz_UZ" : locale === "ru" ? "ru_RU" : "en_US",
+      images: [
+        {
+          url: `${baseUrl}/images/hero-bg.png`,
+        },
+      ],
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: currentSeo.title,
+      description: currentSeo.description,
+      images: [`${baseUrl}/images/hero-bg.png`],
+    },
+  };
 }
 
-export default async function AboutPage({ params }: { params: { locale: string } }) {
-  if (!isLocale(params.locale)) notFound();
-  const locale = params.locale as Locale;
+export function generateStaticParams() {
+  return LOCALES.map((locale) => ({ locale }));
+}
+
+export default async function AboutPage({
+  params,
+}: {
+  params: Promise<{ locale: string }> | { locale: string }; // Next.js 15+ uchun xavfsiz tip
+}) {
+  const resolvedParams = await params;
+  if (!isLocale(resolvedParams.locale)) notFound();
+  const locale = resolvedParams.locale as Locale;
   const dict = getDict(locale);
   const bundle = await fetchSiteBundle(locale);
   const s = bundle.settings;
@@ -26,33 +138,43 @@ export default async function AboutPage({ params }: { params: { locale: string }
     <>
       <PageHero
         locale={locale}
-        eyebrow={s['about_page.hero_eyebrow'] || dict.nav.about}
-        title={s['about_page.hero_title'] || ''}
-        lead={s['about_page.hero_lead'] || ''}
+        eyebrow={s["about_page.hero_eyebrow"] || dict.nav.about}
+        title={s["about_page.hero_title"] || ""}
+        lead={s["about_page.hero_lead"] || ""}
       />
 
       {/* BIZ KIMMIZ — home page bilan bir xil stacked layout */}
       <section className="about about-stacked" id="about">
         <div className="container">
           <div className="about-text">
-            <span className="eyebrow">{s['about_home.eyebrow']}</span>
-            <h2>{s['about_home.title']}</h2>
-            <div dangerouslySetInnerHTML={{ __html: s['about_home.body'] || '' }} />
+            <span className="eyebrow">{s["about_home.eyebrow"]}</span>
+            <h2>{s["about_home.title"]}</h2>
+            <div
+              dangerouslySetInnerHTML={{ __html: s["about_home.body"] || "" }}
+            />
           </div>
           <div className="about-card about-card-row">
-            {(bundle.about_stats || []).filter(st => st.page === 'about_about' || st.page === 'both').map((st) => {
-              const numeric = /^\d+(\.\d+)?$/.test(st.value);
-              return (
-                <div key={st.id} className="row">
-                  <div className="val">
-                    {st.prefix}
-                    {numeric ? <span className="cu" data-target={st.value}>0</span> : st.value}
-                    {st.suffix}
+            {(bundle.about_stats || [])
+              .filter((st) => st.page === "about_about" || st.page === "both")
+              .map((st) => {
+                const numeric = /^\d+(\.\d+)?$/.test(st.value);
+                return (
+                  <div key={st.id} className="row">
+                    <div className="val">
+                      {st.prefix}
+                      {numeric ? (
+                        <span className="cu" data-target={st.value}>
+                          0
+                        </span>
+                      ) : (
+                        st.value
+                      )}
+                      {st.suffix}
+                    </div>
+                    <div className="lbl">{st.label}</div>
                   </div>
-                  <div className="lbl">{st.label}</div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </div>
       </section>
@@ -63,8 +185,12 @@ export default async function AboutPage({ params }: { params: { locale: string }
           <div className="mission-grid">
             <div className="mission-left reveal">
               <h2 className="mission-title">
-                <span className="mission-title-brand">{s['mission.title_brand']}</span>
-                <span className="mission-title-accent">{s['mission.title_accent']}</span>
+                <span className="mission-title-brand">
+                  {s["mission.title_brand"]}
+                </span>
+                <span className="mission-title-accent">
+                  {s["mission.title_accent"]}
+                </span>
               </h2>
               <div className="mission-card">
                 <img
@@ -75,7 +201,7 @@ export default async function AboutPage({ params }: { params: { locale: string }
                 />
                 <div
                   className="mission-card-body"
-                  dangerouslySetInnerHTML={{ __html: s['mission.quote'] || '' }}
+                  dangerouslySetInnerHTML={{ __html: s["mission.quote"] || "" }}
                 />
               </div>
             </div>
@@ -85,8 +211,14 @@ export default async function AboutPage({ params }: { params: { locale: string }
                   src={`${API_BASE}/uploads/seed/Mission/school-building.png`}
                   alt="Sodiq School"
                 />
-                <span className="mission-corner mission-corner-tl" aria-hidden="true"></span>
-                <span className="mission-corner mission-corner-br" aria-hidden="true"></span>
+                <span
+                  className="mission-corner mission-corner-tl"
+                  aria-hidden="true"
+                ></span>
+                <span
+                  className="mission-corner mission-corner-br"
+                  aria-hidden="true"
+                ></span>
               </div>
             </div>
           </div>
@@ -101,7 +233,10 @@ export default async function AboutPage({ params }: { params: { locale: string }
             <span className="eyebrow">{dict.sections.parents_say_eyebrow}</span>
             <h2>{dict.sections.parents_say_title}</h2>
           </div>
-          <TestimonialVideos items={bundle.testimonial_videos} dict={{ left: dict.scroll_left, right: dict.scroll_right }} />
+          <TestimonialVideos
+            items={bundle.testimonial_videos}
+            dict={{ left: dict.scroll_left, right: dict.scroll_right }}
+          />
         </div>
       </section>
 
@@ -111,18 +246,41 @@ export default async function AboutPage({ params }: { params: { locale: string }
           <div className="section-head reveal">
             <span className="eyebrow">{dict.sections.team_eyebrow}</span>
             <h2>{dict.sections.team_title}</h2>
-            <p className="lead" style={{ maxWidth: 700, marginLeft: 'auto', marginRight: 'auto' }}>{dict.sections.team_lead}</p>
+            <p
+              className="lead"
+              style={{ maxWidth: 700, marginLeft: "auto", marginRight: "auto" }}
+            >
+              {dict.sections.team_lead}
+            </p>
           </div>
           <div className="team-row">
             {bundle.teachers.map((t, i) => (
-              <Link key={t.id} href={`/${locale}/ustoz/${t.slug}`} className={`team-card reveal${i ? ' delay-' + (i % 4) : ''}`}>
-                <div className="team-img" style={{ backgroundImage: `url('${resolveMediaUrl(t.image_url)}')` }}></div>
+              <Link
+                key={t.id}
+                href={`/${locale}/ustoz/${t.slug}`}
+                className={`team-card reveal${i ? " delay-" + (i % 4) : ""}`}
+              >
+                <div
+                  className="team-img"
+                  style={{
+                    backgroundImage: `url('${resolveMediaUrl(t.image_url)}')`,
+                  }}
+                ></div>
                 <div className="team-info">
                   <div className="name">{t.name}</div>
                   <div className="role">{t.role}</div>
                   <span className="team-more">
-                    {dict.sections.teacher_more}{' '}
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    {dict.sections.teacher_more}{" "}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
                   </span>
                 </div>
               </Link>
@@ -142,8 +300,16 @@ export default async function AboutPage({ params }: { params: { locale: string }
             {bundle.gallery.map((g) => (
               <div
                 key={g.id}
-                className={`tile ${g.size_class || ''}`.trim()}
-                style={g.image_url ? { backgroundImage: `url('${resolveMediaUrl(g.image_url)}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+                className={`tile ${g.size_class || ""}`.trim()}
+                style={
+                  g.image_url
+                    ? {
+                        backgroundImage: `url('${resolveMediaUrl(g.image_url)}')`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }
+                    : undefined
+                }
               >
                 {!g.image_url && <div className="glyph">S</div>}
                 <div className="overlay">{g.caption}</div>
