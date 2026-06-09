@@ -19,6 +19,7 @@ const seoData: Record<
       "Toshkentdagi elita xususiy maktabi. Yunusoboddagi eng yaxshi maktabda zamonaviy taʼlim, kuchli matematika va TOP universitetlarga tayyorlov.",
     keywords: [
       "sodiq school",
+
       "toshkentdagi xususiy maktablar",
       "xususiy maktab narxlari",
       "yunusoboddagi xususiy maktablar",
