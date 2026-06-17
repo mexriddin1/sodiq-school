@@ -72,15 +72,16 @@ export default function RootLayout({
             })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109775493', 'ym');
 
             ym(109775493, 'init', {
-                ssr: true,
-                webvisor: true,
+                defer: true,
                 clickmap: true,
-                ecommerce: "dataLayer",
-                referrer: document.referrer,
-                url: location.href,
+                trackLinks: true,
                 accurateTrackBounce: true,
-                trackLinks: true
+                webvisor: true,
+                ecommerce: "dataLayer"
             });
+
+            // Next.js client-side navigatsiyani to'g'ri kuzatish uchun url o'zgarishini yuborish
+            ym(109775493, 'hit', window.location.href);
           `}
         </Script>
         <noscript>
