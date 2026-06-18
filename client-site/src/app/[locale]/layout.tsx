@@ -6,7 +6,6 @@ import { Footer } from '@/components/Footer';
 import { ScrollProgress } from '@/components/ScrollProgress';
 import { GlobalScripts } from '@/components/GlobalScripts';
 import { ScrollToTop } from '@/components/ScrollToTop';
-import { PopupForm } from '@/components/PopupForm';
 import { fetchSiteBundle } from '@/lib/api';
 
 export function generateStaticParams() {
@@ -28,7 +27,7 @@ export default async function LocaleLayout({
   try {
     bundle = await fetchSiteBundle(locale);
   } catch (err) {
-    console.error('[layout] failed to fetch site bundle:', err);
+    console.error("[layout] failed to fetch site bundle:", err);
   }
 
   return (
