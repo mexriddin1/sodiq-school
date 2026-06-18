@@ -11,6 +11,7 @@ export function Header({ locale, settings }: { locale: Locale; settings: Record<
   const dict = getDict(locale);
   const pathname = usePathname();
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
+  const isLanding = pathname === `/${locale}/short-landing` || pathname === `/${locale}/long-landing` || pathname === `/${locale}/imtixon-1july`;
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -23,10 +24,13 @@ export function Header({ locale, settings }: { locale: Locale; settings: Record<
 
   // Inner pages (everything except home) get the "solid" header always.
   const isSolid = !isHome;
-  const headerClass = ['header', isSolid && 'solid', scrolled && 'scrolled'].filter(Boolean).join(' ');
+  const headerClass = ['header', isSolid && 'solid', scrolled && 'scrolled', isLanding && 'header--landing'].filter(Boolean).join(' ');
+  const phone = settings['contact.phone'] || '+998 78 888 80 80';
+  const phoneLink = settings['contact.phone_link'] || phone.replace(/\D/g, '');
 
   function isActive(href: string) {
-    return pathname === href || pathname === href + '/';
+    if (href === `/${locale}`) return pathname === href || pathname === href + '/';
+    return pathname === href || pathname?.startsWith(href + '/');
   }
 
   const links = [
@@ -47,29 +51,34 @@ export function Header({ locale, settings }: { locale: Locale; settings: Record<
           lightUrl={settings['brand.logo_light_url']}
           darkUrl={settings['brand.logo_dark_url']}
         />
-        <nav className={'nav' + (open ? ' open' : '')} id="nav">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className={isActive(l.href) ? 'active' : undefined}
-              onClick={() => setOpen(false)}
-            >
-              {l.label}
-            </Link>
-          ))}
-        </nav>
+        {!isLanding && (
+          <nav className={'nav' + (open ? ' open' : '')} id="nav">
+            {links.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={isActive(l.href) ? 'active' : undefined}
+                onClick={() => setOpen(false)}
+              >
+                {l.label}
+              </Link>
+            ))}
+            <a className="btn btn-primary menu-phone" href={`tel:${phoneLink}`}>{phone}</a>
+          </nav>
+        )}
         <div className="header-cta">
           <LanguageSwitcher current={locale} />
-          <Link href={`/${locale}/aloqa`} className="btn btn-primary">{dict.cta_apply}</Link>
-          <button
-            className={'hamburger' + (open ? ' open' : '')}
-            id="hamburger"
-            aria-label={dict.open_menu}
-            onClick={() => setOpen(!open)}
-          >
-            <span></span><span></span><span></span>
-          </button>
+          <a className="btn btn-primary header-phone" href={`tel:${phoneLink}`}>{phone}</a>
+          {!isLanding && (
+            <button
+              className={'hamburger' + (open ? ' open' : '')}
+              id="hamburger"
+              aria-label={dict.open_menu}
+              onClick={() => setOpen(!open)}
+            >
+              <span></span><span></span><span></span>
+            </button>
+          )}
         </div>
       </div>
     </header>

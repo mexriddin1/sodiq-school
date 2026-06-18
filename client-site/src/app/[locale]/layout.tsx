@@ -6,6 +6,7 @@ import { Footer } from '@/components/Footer';
 import { ScrollProgress } from '@/components/ScrollProgress';
 import { GlobalScripts } from '@/components/GlobalScripts';
 import { ScrollToTop } from '@/components/ScrollToTop';
+import { PopupForm } from '@/components/PopupForm';
 import { fetchSiteBundle } from '@/lib/api';
 
 export function generateStaticParams() {
@@ -39,6 +40,7 @@ export default async function LocaleLayout({
       <Footer locale={locale} settings={bundle?.settings || {}} />
       <ScrollToTop />
       <GlobalScripts />
+      <PopupForm locale={locale} />
     </>
   );
 }

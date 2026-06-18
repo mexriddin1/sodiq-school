@@ -11,6 +11,7 @@ import { LogoCarousel } from '@/components/LogoCarousel';
 import { ImgCarousel } from '@/components/ImgCarousel';
 import { CtaBanner } from '@/components/CtaBanner';
 import { GraduationCap, Bars, People, Document, Building } from '@/components/Icons';
+import { getYouTubeEmbedUrl, isDirectVideoUrl } from '@/lib/video';
 
 const advIconMap: Record<string, React.ComponentType> = {
   graduation: GraduationCap,
@@ -27,6 +28,45 @@ export async function generateMetadata({ params }: { params: { locale: string } 
 }
 
 export default async function HomePage({ params }: { params: { locale: string } }) {
+  return HomeContent({ params });
+}
+
+const examLandingAdvantages = [
+  {
+    accent: '1',
+    icon: 'document',
+    title: '1-IYUL IMTIHONI: Biz maktab baholariga aldanib qolmayapmizmi?',
+    body: "Ba'zan kundalikdagi besh baholar ortiga bolaning haqiqiy bilimi yashirinib qoladi. Biz xotirjam yuraveramiz, lekin vaqt o'tib borsa-da, bo'shliqlar to'lmay qolaveradi. 1-iyul kungi imtihon esa shunchaki sinov emas — bu farzandingizning bugungi kungi real darajasini ko'rsatadigan ko'zgu.",
+  },
+  {
+    accent: '2',
+    icon: 'bars',
+    title: 'Real manzara',
+    body: "Kundalikdagi baholar ba'zan andisha ortiga berkinadi. Imtihon esa hech qanday pardasiz bolaning haqiqiy bilimini ko'rsatadi. Qaysi fanda peshqadam-u, qaysi mavzuda ko'makka muhtoj — bor haqiqat bilan yuzma-yuz kelasiz.",
+  },
+  {
+    accent: '3',
+    icon: 'graduation',
+    title: 'Vaqtni tejash',
+    body: "Bola nimani bilmasligini aniqlash uchun oylab vaqt yo'qotmaysiz. Yangi o'quv yilida aynan qaysi bo'shliqlarni to'ldirish kerakligi ochiq-oydin ko'rinadi. Adashib sarflanadigan vaqt va ortiqcha xarajatlar tejaladi.",
+  },
+  {
+    accent: '4',
+    icon: 'people',
+    title: "To'g'ri qaror",
+    body: "Farzandingiz kelajagini taxminlarga qarab emas, aniq faktlarga tayanib rejalashtirasiz. Bu esa uni kelajakda noto'g'ri yo'nalish tanlashdan asraydi.",
+  },
+];
+
+type HomeVariant = 'default' | 'exam-1july';
+
+export async function HomeContent({
+  params,
+  variant = 'default',
+}: {
+  params: { locale: string };
+  variant?: HomeVariant;
+}) {
   if (!isLocale(params.locale)) notFound();
   const locale = params.locale as Locale;
   const dict = getDict(locale);
@@ -34,6 +74,20 @@ export default async function HomePage({ params }: { params: { locale: string } 
   const s = bundle.settings;
   const phone = s['contact.phone'] || '+998 78 888 80 80';
   const phoneLink = s['contact.phone_link'] || phone.replace(/\D/g, '');
+  const isExamLanding = variant === 'exam-1july';
+  const hero = isExamLanding
+    ? {
+        pill: '1-iyul imtihoni',
+        title: <>Farzandingiz bilimini sinang</>,
+        lead: 'Sodiq School da 2026-2027 BEPUL qabul imtixoniga farzandingizni yozdiring va farzandingiz aniq bilimini bilib oling.',
+        cta: 'Ariza qoldirish',
+      }
+    : {
+        pill: s['hero.pill'],
+        title: <>{s['hero.title_main']} <span className="accent">{s['hero.title_accent']}</span> {s['hero.title_suffix']}</>,
+        lead: s['hero.lead'] || '',
+        cta: s['hero.cta_primary'],
+      };
 
   const indexUnis = bundle.universities.filter(u => u.page === 'index' || u.page === 'both');
   const indexFaqs = bundle.faqs.filter(f => f.page === 'index' || f.page === 'both');
@@ -50,20 +104,32 @@ export default async function HomePage({ params }: { params: { locale: string } 
         includes: s['pricing.includes'] || '',
         cta_label: s['pricing.cta'] || dict.cta_apply,
       }];
+  const advantages = isExamLanding
+    ? examLandingAdvantages.map((a, index) => ({
+        id: index + 1,
+        accent_num: a.accent,
+        icon_key: a.icon,
+        title: a.title,
+        description: a.body,
+      }))
+    : (bundle.advantages || []);
+  const ctaSettings = isExamLanding
+    ? Object.fromEntries(Object.entries(s).filter(([key]) => key.startsWith('contact.')))
+    : s;
 
   return (
     <>
       {/* HERO */}
       <section className="hero" id="top">
         <div className="container hero-inner">
-          <span className="pill reveal"><span className="dot"></span>{s['hero.pill']}</span>
+          <span className="pill reveal"><span className="dot"></span>{hero.pill}</span>
           <h1 className="reveal delay-1">
-            {s['hero.title_main']} <span className="accent">{s['hero.title_accent']}</span> {s['hero.title_suffix']}
+            {hero.title}
           </h1>
-          <p className="lead reveal delay-2" dangerouslySetInnerHTML={{ __html: s['hero.lead'] || '' }} />
+          <p className="lead reveal delay-2" dangerouslySetInnerHTML={{ __html: hero.lead }} />
           <div className="hero-actions reveal delay-3">
-            <Link href={`/${locale}/aloqa`} className="btn btn-primary btn-large">{s['hero.cta_primary']}</Link>
-            <a href="#results" className="text-link on-dark">{s['hero.cta_secondary']}</a>
+            <button type="button" className="btn btn-primary btn-large" data-popup-open>{hero.cta}</button>
+            {!isExamLanding && <a href="#results" className="text-link on-dark">{s['hero.cta_secondary']}</a>}
           </div>
           <div className="hero-stats reveal delay-4">
             <HeroStat
@@ -111,6 +177,8 @@ export default async function HomePage({ params }: { params: { locale: string } 
       </section>
 
       {/* MISSIYA — 2 ustunli yangi struktura */}
+      {!isExamLanding && (
+        <>
       <section className="mission mission-v2">
         <div className="container">
           <div className="mission-grid">
@@ -260,16 +328,37 @@ export default async function HomePage({ params }: { params: { locale: string } 
             <p className="sub" style={{ color: 'rgba(255,255,255,.55)' }}>{s['awards.subtitle']}</p>
           </div>
           <div className="awards-grid">
-            {bundle.awards.map((a, i) => (
+            {bundle.awards.map((a, i) => {
+              const youtubeEmbedUrl = getYouTubeEmbedUrl(a.video_url);
+              const directVideo = isDirectVideoUrl(a.video_url);
+              const image = a.image_url
+                ? <img src={resolveMediaUrl(a.image_url)} alt={a.title} />
+                : <div style={{ background: 'var(--navy)', width: '100%', height: '100%' }} />;
+              return (
               <div key={a.id} className={`award-card reveal${i ? ' delay-' + i : ''}`} data-tilt>
                 <div className="award-shimmer"></div>
-                <div className="award-media">
-                  {a.image_url
-                    ? <img src={resolveMediaUrl(a.image_url)} alt={a.title} />
-                    : <div style={{ background: 'var(--navy)', width: '100%', height: '100%' }} />}
-                  <div className="award-play">
-                    <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
-                  </div>
+                <div className={'award-media' + (a.video_url ? ' has-video' : '')}>
+                  {youtubeEmbedUrl ? (
+                    <iframe
+                      src={youtubeEmbedUrl}
+                      title={a.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : directVideo && a.video_url ? (
+                    <video controls preload="metadata" poster={resolveMediaUrl(a.image_url)}>
+                      <source src={resolveMediaUrl(a.video_url)} />
+                    </video>
+                  ) : a.video_url ? (
+                    <a href={a.video_url} target="_blank" rel="noopener noreferrer" className="award-media-link" aria-label={a.title}>
+                      {image}
+                      <div className="award-play">
+                        <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+                      </div>
+                    </a>
+                  ) : (
+                    image
+                  )}
                 </div>
                 <h3>{a.title}</h3>
                 <p>{a.description}</p>
@@ -295,7 +384,8 @@ export default async function HomePage({ params }: { params: { locale: string } 
                 </div>
                 <div className="award-total" dangerouslySetInnerHTML={{ __html: a.total_label || '' }} />
               </div>
-            ))}
+            );
+            })}
           </div>
 
           <div className="awards-summary reveal">
@@ -317,18 +407,25 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </div>
       </section>
 
-      {/* IMAGE CAROUSEL */}
-      <ImgCarousel items={bundle.carousel} />
+        </>
+      )}
+
+      {!isExamLanding && (
+        <>
+          {/* IMAGE CAROUSEL */}
+          <ImgCarousel items={bundle.carousel} />
+        </>
+      )}
 
       {/* ADVANTAGES */}
       <section className="advantages">
         <div className="container">
           <div className="section-head reveal">
             <span className="eyebrow">{dict.sections.advantages_eyebrow}</span>
-            <h2>{dict.sections.advantages_title}</h2>
+            <h2>{isExamLanding ? 'Sodiq school imtixonida farzandingiz bilimini sinang' : dict.sections.advantages_title}</h2>
           </div>
           <div className="advantages-grid">
-            {(bundle.advantages || []).map((a) => (
+            {advantages.map((a) => (
               <AdvCard
                 key={a.id}
                 accent={String(a.accent_num || 1)}
@@ -342,6 +439,8 @@ export default async function HomePage({ params }: { params: { locale: string } 
       </section>
 
       {/* PRICING — yangi section */}
+      {!isExamLanding && (
+        <>
       <section className="pricing" id="narx">
         <div className="container">
           <div className="section-head reveal">
@@ -364,7 +463,7 @@ export default async function HomePage({ params }: { params: { locale: string } 
                       </div>
                     ))}
                   </div>
-                  <Link href={`/${locale}/aloqa`} className="btn btn-primary btn-large">{p.cta_label || dict.cta_apply}</Link>
+                  <button type="button" className="btn btn-primary btn-large" data-popup-open>{p.cta_label || dict.cta_apply}</button>
                 </div>
               );
             })}
@@ -385,9 +484,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
             <div className="adm-col-steps reveal">
               <h3 className="adm-col-title">{s['admissions.process_title']}</h3>
               <div className="adm-timeline">
-                <AdmStep n={1} lbl={dict.sections.admissions_step1_label} desc={dict.sections.admissions_step1_desc} hasLine />
-                <AdmStep n={2} lbl={dict.sections.admissions_step2_label} desc={dict.sections.admissions_step2_desc} hasLine />
-                <AdmStep n={3} lbl={dict.sections.admissions_step3_label} desc={dict.sections.admissions_step3_desc} />
+                <AdmStep n={1} lbl={s['admissions.step1_label']} desc={s['admissions.step1_desc']} hasLine />
+                <AdmStep n={2} lbl={s['admissions.step2_label']} desc={s['admissions.step2_desc']} hasLine />
+                <AdmStep n={3} lbl={s['admissions.step3_label']} desc={s['admissions.step3_desc']} />
               </div>
             </div>
 
@@ -409,10 +508,9 @@ export default async function HomePage({ params }: { params: { locale: string } 
                 <AdmInfoItem label={s['admissions.info1_label']} value={s['admissions.info1_value']} />
                 <AdmInfoItem label={s['admissions.info2_label']} value={s['admissions.info2_value']} />
                 <AdmInfoItem label={s['admissions.info3_label']} value={s['admissions.info3_value']} />
-                <AdmInfoItem label={s['admissions.info4_label']} value={s['admissions.info4_value']} highlight />
               </div>
-              <Link href={`/${locale}/aloqa`} className="btn btn-primary btn-large btn-block">{dict.sections.admissions_register}</Link>
-              <p className="adm-secondary">{dict.sections.admissions_secondary} <a href={`tel:${phoneLink}`}>{phone}</a></p>
+              <button type="button" className="btn btn-primary btn-large btn-block" data-popup-open>{s['admissions.register']}</button>
+              <p className="adm-secondary">{s['admissions.secondary']} <a href={`tel:${phoneLink}`}>{phone}</a></p>
             </div>
           </div>
         </div>
@@ -436,8 +534,11 @@ export default async function HomePage({ params }: { params: { locale: string } 
         </div>
       </section>
 
+        </>
+      )}
+
       {/* CTA BANNER */}
-      <CtaBanner locale={locale} settings={s} />
+      <CtaBanner locale={locale} settings={ctaSettings} />
     </>
   );
 }

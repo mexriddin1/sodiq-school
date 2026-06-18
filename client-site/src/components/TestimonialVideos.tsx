@@ -1,7 +1,6 @@
 import type { SiteBundle } from '@/lib/api';
 import { resolveMediaUrl } from '@/lib/api';
-
-const VIDEO_EXTS = /\.(mp4|webm|ogg|mov|m4v)(\?|$)/i;
+import { getYouTubeEmbedUrl, isDirectVideoUrl } from '@/lib/video';
 
 export function TestimonialVideos({ items, dict }: {
   items: SiteBundle['testimonial_videos'];
@@ -11,11 +10,20 @@ export function TestimonialVideos({ items, dict }: {
     <div className="video-grid reveal delay-1">
       {items.map((v) => {
         const poster = resolveMediaUrl(v.thumbnail_url) || undefined;
-        const isDirectVideo = VIDEO_EXTS.test(v.url);
+        const youtubeEmbedUrl = getYouTubeEmbedUrl(v.url);
+        const isDirectVideo = isDirectVideoUrl(v.url);
         return (
           <div key={v.id} className="video-card">
             <div className="video-frame">
-              {isDirectVideo ? (
+              {youtubeEmbedUrl ? (
+                <iframe
+                  className="video-player"
+                  src={youtubeEmbedUrl}
+                  title={v.name || 'Video'}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : isDirectVideo ? (
                 <video
                   className="video-player"
                   controls
@@ -39,12 +47,6 @@ export function TestimonialVideos({ items, dict }: {
                 </a>
               )}
             </div>
-            {(v.name || v.role) && (
-              <div className="video-meta">
-                {v.name && <div className="video-name">{v.name}</div>}
-                {v.role && <div className="video-role">{v.role}</div>}
-              </div>
-            )}
           </div>
         );
       })}

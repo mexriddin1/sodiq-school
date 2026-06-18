@@ -484,6 +484,7 @@ CREATE TABLE application_submissions (
   name VARCHAR(150) NOT NULL,
   phone VARCHAR(40) NOT NULL,
   message TEXT,
+  age VARCHAR(40),
   grade VARCHAR(20),
   region VARCHAR(120),
   status ENUM('new','contacted','closed') NOT NULL DEFAULT 'new',

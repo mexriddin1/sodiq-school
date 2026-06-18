@@ -7,6 +7,7 @@ import { getDict } from '@/i18n/dictionaries';
 import { fetchSiteBundle, resolveMediaUrl } from '@/lib/api';
 import { PageHero } from '@/components/PageHero';
 import { BlogSearch } from '@/components/BlogSearch';
+import { CtaBanner } from '@/components/CtaBanner';
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   if (!isLocale(params.locale)) return {};
@@ -52,6 +53,8 @@ export default async function BlogIndex({ params }: { params: { locale: string }
           </div>
         </div>
       </section>
+
+      <CtaBanner locale={locale} settings={s} />
     </>
   );
 }

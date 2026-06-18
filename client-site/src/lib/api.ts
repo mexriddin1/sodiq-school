@@ -48,7 +48,7 @@ export type SiteBundle = {
     ielts: Array<{ id: number; exam_type: string; score: string; image_id: number | null; year: number; sort_order: number; image_url: string | null; name: string; grade: string }>;
     sat:   Array<{ id: number; exam_type: string; score: string; image_id: number | null; year: number; sort_order: number; image_url: string | null; name: string; grade: string }>;
   };
-  awards: Array<{ id: number; icon_key: string; image_id: number | null; image_url: string | null; gold_count: number; silver_count: number; bronze_count: number; total_label_value: string; sort_order: number; title: string; description: string; gold_label: string; silver_label: string; bronze_label: string; total_label: string }>;
+  awards: Array<{ id: number; icon_key: string; image_id: number | null; image_url: string | null; video_url: string | null; gold_count: number; silver_count: number; bronze_count: number; total_label_value: string; sort_order: number; title: string; description: string; gold_label: string; silver_label: string; bronze_label: string; total_label: string }>;
   universities: Array<{ id: number; raw_name: string; image_id: number | null; image_url: string | null; group: 'main'|'partner'|'practice'; track: 'left'|'right'; page: 'index'|'natijalar'|'both'; sort_order: number; name: string }>;
   carousel: Array<{ id: number; image_id: number | null; image_url: string | null; sort_order: number }>;
   blog_posts: Array<{ id: number; slug: string; image_id: number | null; published_at: string | null; sort_order: number; image_url: string | null; badge: string; date_label: string; title: string; excerpt: string }>;
@@ -105,7 +105,8 @@ export async function fetchTeacherBySlug(slug: string, locale: Locale): Promise<
 }
 
 export async function submitApplication(payload: {
-  name: string; phone: string; message?: string; grade?: string; source_form?: string;
+  name: string; phone: string; message?: string; age?: string; grade?: string; region?: string; source_form?: string;
+  event_id?: string; fbp?: string; fbc?: string;
 }): Promise<void> {
   await apiFetch<{ ok: boolean }>(`/api/applications`, {
     method: 'POST', body: JSON.stringify(payload),

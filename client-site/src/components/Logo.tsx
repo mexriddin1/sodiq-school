@@ -4,8 +4,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import type { Locale } from '@/i18n/config';
 import { resolveMediaUrl } from '@/lib/api';
 
-// Two-image logo: Light variant for transparent header, Dark for solid/scrolled.
-// CSS in globals.css toggles which one is visible based on header state.
+// Single-image logo, matching the Seven School header: the floating header is
+// always on a light shell, so the dark-coloured logo is rendered directly.
 export function Logo({
   locale,
   lightUrl,
@@ -19,13 +19,11 @@ export function Logo({
   brand?: string;
   variant?: 'header' | 'footer';
 }) {
-  // NOTE: Source files are named the opposite of what they are visually:
-  // - "Light.png" is actually the DARK-coloured logo (use on light/white backgrounds)
-  // - "Dark.png"  is actually the LIGHT/white logo (use on dark backgrounds)
-  // CSS shows `.logo-light` on transparent (dark) headers and `.logo-dark` on solid
-  // (white) headers, so we point the file refs accordingly.
-  const lightForDarkBg = resolveMediaUrl(lightUrl || '/uploads/seed/Logo/Dark.png');
-  const darkForLightBg = resolveMediaUrl(darkUrl || '/uploads/seed/Logo/Light.png');
+  // File-naming reality from the uploaded assets:
+  //   "Light.png" = dark-coloured logo, for light backgrounds
+  //   "Dark.png"  = light/white logo, for dark backgrounds
+  const onLightBg = resolveMediaUrl(darkUrl || '/uploads/seed/Logo/Light.png');
+  const onDarkBg = resolveMediaUrl(lightUrl || '/uploads/seed/Logo/Dark.png');
   const alt = brand || 'Sodiq School';
   const home = `/${locale}`;
   const pathname = usePathname();
@@ -51,15 +49,14 @@ export function Logo({
   if (variant === 'footer') {
     return (
       <Link className="logo" href={home} aria-label={alt} onClick={handleClick}>
-        <img src={lightForDarkBg} alt={alt} height={40} />
+        <img src={onDarkBg} alt={alt} height={40} />
       </Link>
     );
   }
 
   return (
-    <Link className="logo" href={home} aria-label={alt} onClick={handleClick}>
-      <img className="logo-light" src={lightForDarkBg} alt={alt} height={40} />
-      <img className="logo-dark" src={darkForLightBg} alt={alt} height={40} />
+    <Link className="nav-logo" href={home} aria-label={alt} onClick={handleClick}>
+      <img src={onLightBg} alt={alt} />
     </Link>
   );
 }

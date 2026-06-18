@@ -5,6 +5,7 @@ import { requireAuth } from '../middleware/auth.js';
 import { HttpError } from '../middleware/errors.js';
 import { notifyLeadSubmission } from '../services/lead-notifications.js';
 import { dispatchEvent } from '../services/webhook-dispatcher.js';
+import { sendLeadEvent, buildEventId } from '../services/meta-capi.js';
 
 const router = Router();
 
@@ -12,18 +13,22 @@ const submitSchema = z.object({
   name: z.string().min(1).max(150),
   phone: z.string().min(4).max(40),
   message: z.string().max(5000).nullable().optional(),
+  age: z.string().max(40).nullable().optional(),
   grade: z.string().max(20).nullable().optional(),
   region: z.string().max(120).nullable().optional(),
   source_form: z.string().max(60).optional(),
+  event_id: z.string().max(120).optional(),
+  fbp: z.string().max(200).optional(),
+  fbc: z.string().max(500).optional(),
 });
 
 // Public: form submission
 router.post('/', async (req, res) => {
   const b = submitSchema.parse(req.body);
   const result = await query(
-    `INSERT INTO application_submissions (source_form, name, phone, message, grade, region, status)
-     VALUES (?, ?, ?, ?, ?, ?, 'new')`,
-    [b.source_form ?? 'contact', b.name, b.phone, b.message ?? null, b.grade ?? null, b.region ?? null],
+    `INSERT INTO application_submissions (source_form, name, phone, message, age, grade, region, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'new')`,
+    [b.source_form ?? 'contact', b.name, b.phone, b.message ?? null, b.age ?? null, b.grade ?? null, b.region ?? null],
   );
   const leadPayload = {
     ...b,
@@ -32,10 +37,14 @@ router.post('/', async (req, res) => {
     lead_id: result.insertId,
     created_at: new Date().toISOString(),
   };
+  // Browser generates eventId and fires fbq('track','Lead',{},{eventID}) — same id reused here for dedup.
+  // Fallback to a server-side id only if the client didn't provide one.
+  const eventId = b.event_id || buildEventId();
   // Respond fast; deliveries happen in background
-  res.status(201).json({ ok: true });
+  res.status(201).json({ ok: true, meta_event_id: eventId });
   notifyLeadSubmission(leadPayload).catch((err) => console.error('[email] notify error', err.message));
   dispatchEvent('application.created', leadPayload).catch((err) => console.error('[webhook] dispatch error', err.message));
+  sendLeadEvent(leadPayload, req, eventId).catch((err) => console.error('[meta-capi] error', err.message));
 });
 
 // Admin: list/inbox

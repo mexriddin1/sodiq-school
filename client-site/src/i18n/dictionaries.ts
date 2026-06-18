@@ -27,6 +27,8 @@ export type Dict = {
     grade: string;
     grade_choose: string;
     grade_options: string[];
+    region: string;
+    region_choose: string;
     message: string;
     message_placeholder: string;
     submit: string;
@@ -123,11 +125,12 @@ const uz: Dict = {
   form: {
     name: "To'liq ism-sharif", name_placeholder: 'Ismingiz',
     phone: 'Telefon raqami', phone_placeholder: '+998 90 123 45 67',
-    grade: 'Farzandingiz sinfi', grade_choose: 'Tanlang...',
-    grade_options: ['7-sinf','8-sinf','9-sinf','10-sinf','11-sinf'],
+    grade: 'Farzandingiz sinfi', grade_choose: 'Sinfni tanlang',
+    grade_options: ['1-sinf','2-sinf','3-sinf','4-sinf','5-sinf','6-sinf','7-sinf','8-sinf','9-sinf','10-sinf','11-sinf'],
+    region: 'Viloyat', region_choose: 'Viloyatni tanlang...',
     message: 'Savolingiz', message_placeholder: 'Savolingizni yozing...',
     submit: 'Maslahat olaman', submitted: 'Yuborildi!',
-    success: 'Rahmat! Arizangiz qabul qilindi. 24 soat ichida bog\'lanamiz.',
+    success: 'Arizangiz qabul qilindi. Operatorimiz eng qisqa vaqt ichida siz bilan bog\'lanadi.',
     privacy: "Ma'lumotlaringiz uchinchi shaxslarga oshkor etilmaydi.",
   },
   sections: {
@@ -204,10 +207,11 @@ const ru: Dict = {
     name: 'ФИО', name_placeholder: 'Ваше имя',
     phone: 'Номер телефона', phone_placeholder: '+998 90 123 45 67',
     grade: 'Класс ребёнка', grade_choose: 'Выберите...',
-    grade_options: ['7 класс','8 класс','9 класс','10 класс','11 класс'],
+    grade_options: ['1 класс','2 класс','3 класс','4 класс','5 класс','6 класс','7 класс','8 класс','9 класс','10 класс','11 класс'],
+    region: 'Регион', region_choose: 'Выберите регион...',
     message: 'Ваш вопрос', message_placeholder: 'Напишите ваш вопрос...',
     submit: 'Получить консультацию', submitted: 'Отправлено!',
-    success: 'Спасибо! Заявка принята. Свяжемся в течение 24 часов.',
+    success: 'Ваша заявка принята. Наш оператор свяжется с вами в ближайшее время.',
     privacy: 'Ваши данные не передаются третьим лицам.',
   },
   sections: {
@@ -284,10 +288,11 @@ const en: Dict = {
     name: 'Full name', name_placeholder: 'Your name',
     phone: 'Phone number', phone_placeholder: '+998 90 123 45 67',
     grade: "Child's grade", grade_choose: 'Choose...',
-    grade_options: ['Grade 7','Grade 8','Grade 9','Grade 10','Grade 11'],
+    grade_options: ['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6','Grade 7','Grade 8','Grade 9','Grade 10','Grade 11'],
+    region: 'Region', region_choose: 'Choose a region...',
     message: 'Your question', message_placeholder: 'Write your question...',
     submit: 'Get a consultation', submitted: 'Submitted!',
-    success: 'Thank you! Your application is received. We will contact you within 24 hours.',
+    success: 'Your request has been received. Our operator will contact you shortly.',
     privacy: 'Your information is not shared with third parties.',
   },
   sections: {

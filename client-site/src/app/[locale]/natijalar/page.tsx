@@ -121,7 +121,7 @@ export default async function NatijalarPage({ params }: { params: { locale: stri
         </div>
       </section>
 
-      <CtaBanner locale={locale} settings={s} showMap={false} />
+      <CtaBanner locale={locale} settings={s} />
     </>
   );
 }

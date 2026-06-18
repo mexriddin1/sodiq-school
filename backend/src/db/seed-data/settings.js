@@ -19,6 +19,7 @@ const settings = [
     ru: 'Ташкент, Юнусабадский район, ул. Амира Темура 142',
     en: 'Tashkent, Yunusobod district, Amir Temur street 142',
     group: 'contact',
+    description: "Bir nechta manzilni yangi qatordan yoki | belgisi bilan ajrating. Misol: \"Manzil 1 | Manzil 2\"",
   },
   { key: 'contact.hours',
     uz: 'Dushanba–Juma · 9:00–18:00',
@@ -29,6 +30,10 @@ const settings = [
   { key: 'contact.telegram', raw: 'https://t.me/sodiq_school', group: 'contact' },
   { key: 'contact.instagram', raw: 'https://instagram.com/sodiqschool.uz', group: 'contact' },
   { key: 'contact.youtube', raw: 'https://youtube.com/@sodiq_school', group: 'contact' },
+  { key: 'contact.map_lat', raw: '41.2389', group: 'contact', description: 'Google Map latitude. Example: 41.2389' },
+  { key: 'contact.map_lng', raw: '69.2181', group: 'contact', description: 'Google Map longitude. Example: 69.2181' },
+  { key: 'contact.map_zoom', raw: '16', group: 'contact', description: 'Google Map zoom level. Usually 14-18.' },
+  { key: 'contact.map_embed_url', raw: '', group: 'contact', description: 'Optional full Google Maps embed URL. If filled, it overrides lat/lng.' },
 
   // Hero (index)
   { key: 'hero.pill',
@@ -247,9 +252,9 @@ const settings = [
     group: 'admissions',
   },
   { key: 'admissions.desc',
-    uz: "Qabul iyul oyida boshlanadi. Imtihondan yaxshi natija olgan o'quvchilarga ichki <strong>grant</strong> beriladi. Farzandingiz <strong>bepul</strong> yoki <strong>chegirma</strong> asosida o'qishi mumkin.",
-    ru: 'Приём начинается в июле. Ученикам с высокими результатами вступительного экзамена предоставляется внутренний <strong>грант</strong>. Ваш ребёнок может учиться <strong>бесплатно</strong> или со <strong>скидкой</strong>.',
-    en: 'Admissions start in July. Students with high entrance exam results receive an internal <strong>grant</strong>. Your child can study <strong>for free</strong> or with a <strong>discount</strong>.',
+    uz: 'Imtihon asosida saralangan bolalar qatorida farzandingiz tahsil oladi.',
+    ru: 'Ваш ребёнок будет учиться среди детей, отобранных по результатам экзамена.',
+    en: 'Your child will study among students selected through an entrance exam.',
     group: 'admissions',
   },
   { key: 'admissions.scarcity',
@@ -258,6 +263,29 @@ const settings = [
     en: 'Limited seats — only <strong>20 spots</strong> per grade',
     group: 'admissions',
   },
+  { key: 'admissions.process_title', uz: 'Qabul jarayoni', ru: 'Процесс приёма', en: 'Admission process', group: 'admissions' },
+  { key: 'admissions.step1_label', uz: 'Imtihon', ru: 'Экзамен', en: 'Exam', group: 'admissions' },
+  { key: 'admissions.step1_desc', uz: 'Matematika, ingliz tili, tanqidiy fikrlash — 2 soat', ru: 'Математика, английский, критическое мышление — 2 часа', en: 'Math, English, critical thinking — 2 hours', group: 'admissions' },
+  { key: 'admissions.step2_label', uz: 'Suhbat', ru: 'Собеседование', en: 'Interview', group: 'admissions' },
+  { key: 'admissions.step2_desc', uz: 'Bola va ota-onalari bilan suhbat', ru: 'Беседа с ребёнком и родителями', en: 'Conversation with the child and parents', group: 'admissions' },
+  { key: 'admissions.step3_label', uz: 'Natija va qabul', ru: 'Результат и приём', en: 'Result and admission', group: 'admissions' },
+  { key: 'admissions.step3_desc', uz: "Natijaga ko'ra qabul qilinadi", ru: 'Приём по результатам отбора', en: 'Admission based on selection results', group: 'admissions' },
+  { key: 'admissions.exams_title', uz: 'Imtihon fanlari', ru: 'Экзаменационные предметы', en: 'Exam subjects', group: 'admissions' },
+  { key: 'admissions.test1_name', uz: 'Matematika', ru: 'Математика', en: 'Mathematics', group: 'admissions' },
+  { key: 'admissions.test1_sub', uz: 'Mantiq va hisoblash', ru: 'Логика и счёт', en: 'Logic and calculation', group: 'admissions' },
+  { key: 'admissions.test2_name', uz: 'Mantiqiy fikrlash', ru: 'Логическое мышление', en: 'Logical thinking', group: 'admissions' },
+  { key: 'admissions.test2_sub', uz: 'Tahlil va mushohada', ru: 'Анализ и рассуждение', en: 'Analysis and reasoning', group: 'admissions' },
+  { key: 'admissions.test3_name', uz: 'Ingliz tili', ru: 'Английский язык', en: 'English', group: 'admissions' },
+  { key: 'admissions.test3_sub', uz: 'Grammar va reading', ru: 'Грамматика и чтение', en: 'Grammar and reading', group: 'admissions' },
+  { key: 'admissions.info_title', uz: "Ma'lumot", ru: 'Информация', en: 'Information', group: 'admissions' },
+  { key: 'admissions.info1_label', uz: 'Qabul qilinadigan sinflar', ru: 'Принимаемые классы', en: 'Grades accepted', group: 'admissions' },
+  { key: 'admissions.info1_value', uz: '7–11 sinf', ru: '7–11 класс', en: 'Grades 7–11', group: 'admissions' },
+  { key: 'admissions.info2_label', uz: 'Imtihon davomiyligi', ru: 'Продолжительность экзамена', en: 'Exam duration', group: 'admissions' },
+  { key: 'admissions.info2_value', uz: '2 soat', ru: '2 часа', en: '2 hours', group: 'admissions' },
+  { key: 'admissions.info3_label', uz: 'Natija', ru: 'Результат', en: 'Result', group: 'admissions' },
+  { key: 'admissions.info3_value', uz: "Saralash asosida", ru: 'По результатам отбора', en: 'Based on selection', group: 'admissions' },
+  { key: 'admissions.register', uz: "Ro'yxatdan o'tish", ru: 'Записаться', en: 'Register', group: 'admissions' },
+  { key: 'admissions.secondary', uz: 'Savollaringiz bormi?', ru: 'Есть вопросы?', en: 'Got questions?', group: 'admissions' },
 
   // Footer copyright
   { key: 'footer.copyright',
@@ -347,9 +375,9 @@ export async function seedSettings() {
   console.log('[seed] settings...');
   for (const s of settings) {
     await query(
-      `INSERT INTO settings (\`key\`, value_uz, value_ru, value_en, value_raw, \`group\`)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [s.key, s.uz ?? null, s.ru ?? null, s.en ?? null, s.raw ?? null, s.group ?? 'general'],
+      `INSERT INTO settings (\`key\`, value_uz, value_ru, value_en, value_raw, \`group\`, description)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [s.key, s.uz ?? null, s.ru ?? null, s.en ?? null, s.raw ?? null, s.group ?? 'general', s.description ?? null],
     );
   }
 }

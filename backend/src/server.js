@@ -38,6 +38,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
+// Behind nginx/PM2 — needed so req.ip and X-Forwarded-For surface the real client IP for Meta CAPI.
+app.set('trust proxy', true);
+
 app.use(cors({
   origin: [env.clientOrigin, env.adminOrigin],
   credentials: true,

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '@/lib/api';
 import { useToast } from '@/components/ToastProvider';
 import { LocaleTabs, useLocaleTabs, LOCALES } from '@/components/LocaleTabs';
@@ -10,6 +10,37 @@ type SettingRow = {
   value_uz: string | null; value_ru: string | null; value_en: string | null;
   value_raw: string | null;
 };
+
+type MapLocation = {
+  name: string;
+  address: string;
+  lat: string;
+  lng: string;
+  zoom: string;
+};
+
+const MAP_LOCATIONS_KEY = 'contact.map_locations';
+
+function emptyLocation(): MapLocation {
+  return { name: '', address: '', lat: '', lng: '', zoom: '16' };
+}
+
+function parseLocations(value?: string | null): MapLocation[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((item) => ({
+      name: String(item?.name || ''),
+      address: String(item?.address || ''),
+      lat: String(item?.lat || ''),
+      lng: String(item?.lng || ''),
+      zoom: String(item?.zoom || '16'),
+    }));
+  } catch {
+    return [];
+  }
+}
 
 export default function SettingsPage() {
   const [rows, setRows] = useState<SettingRow[]>([]);
@@ -60,6 +91,56 @@ export default function SettingsPage() {
     setRows((prev) => prev.map((r, i) => i === idx ? { ...r, ...patch } : r));
   }
 
+  const mapRow = useMemo(() => rows.find((r) => r.key === MAP_LOCATIONS_KEY), [rows]);
+  const mapLocations = useMemo(() => parseLocations(mapRow?.value_raw), [mapRow?.value_raw]);
+
+  function setMapLocations(next: MapLocation[]) {
+    setRows((prev) => {
+      const value = JSON.stringify(next);
+      const existingIndex = prev.findIndex((r) => r.key === MAP_LOCATIONS_KEY);
+      if (existingIndex === -1) {
+        return [
+          ...prev,
+          {
+            key: MAP_LOCATIONS_KEY,
+            group: 'contact',
+            description: 'Map manzillari JSON',
+            value_uz: null,
+            value_ru: null,
+            value_en: null,
+            value_raw: value,
+          },
+        ];
+      }
+      return prev.map((r, i) => i === existingIndex ? { ...r, value_raw: value } : r);
+    });
+  }
+
+  function patchLocation(index: number, patch: Partial<MapLocation>) {
+    setMapLocations(mapLocations.map((item, i) => i === index ? { ...item, ...patch } : item));
+  }
+
+  async function saveMapLocations() {
+    const row = rows.find((r) => r.key === MAP_LOCATIONS_KEY) || {
+      key: MAP_LOCATIONS_KEY,
+      group: 'contact',
+      description: 'Har bir manzil uchun nom, adres va koordinata.',
+      value_uz: null,
+      value_ru: null,
+      value_en: null,
+      value_raw: JSON.stringify(mapLocations),
+    };
+    await save({
+      ...row,
+      group: 'contact',
+      value_uz: null,
+      value_ru: null,
+      value_en: null,
+      value_raw: JSON.stringify(mapLocations),
+      description: 'Har bir manzil uchun nom, adres va koordinata.',
+    });
+  }
+
   const visible = rows
     .map((r, idx) => ({ row: r, idx }))
     .filter(({ row }) => row.group === activeGroup);
@@ -86,9 +167,78 @@ export default function SettingsPage() {
               </div>
             </div>
 
+            {activeGroup === 'contact' && (
+              <div className="card">
+                <div className="between" style={{ marginBottom: 8 }}>
+                  <div>
+                    <h3 style={{ margin: 0 }}>Map manzillar</h3>
+                    <p className="muted" style={{ margin: '6px 0 0', fontSize: '0.82rem' }}>
+                      Har bir manzilni alohida yarating. Nomi, manzili va koordinatasi saytdagi map gridda chiqadi.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    disabled={busyKey === MAP_LOCATIONS_KEY}
+                    onClick={saveMapLocations}
+                  >
+                    {busyKey === MAP_LOCATIONS_KEY ? '...' : 'Maplarni saqlash'}
+                  </button>
+                </div>
+                <div style={{ display: 'grid', gap: 12 }}>
+                  {mapLocations.map((item, index) => (
+                    <div key={index} className="card" style={{ background: '#f8fafc', margin: 0 }}>
+                      <div className="between" style={{ marginBottom: 10 }}>
+                        <strong>Manzil {index + 1}</strong>
+                        <button
+                          type="button"
+                          className="btn btn-outline btn-sm"
+                          onClick={() => setMapLocations(mapLocations.filter((_, i) => i !== index))}
+                        >
+                          O'chirish
+                        </button>
+                      </div>
+                      <div className="field-row">
+                        <label>
+                          <span className="field-label">Nomi</span>
+                          <input className="input" value={item.name} onChange={(e) => patchLocation(index, { name: e.target.value })} placeholder="Masalan: Istirohat" />
+                        </label>
+                        <label>
+                          <span className="field-label">Manzil</span>
+                          <input className="input" value={item.address} onChange={(e) => patchLocation(index, { address: e.target.value })} placeholder="Shayxontoxur tumani, Istirohat-258" />
+                        </label>
+                      </div>
+                      <div className="field-row">
+                        <label>
+                          <span className="field-label">Latitude</span>
+                          <input className="input" value={item.lat} onChange={(e) => patchLocation(index, { lat: e.target.value })} placeholder="41.3265" />
+                        </label>
+                        <label>
+                          <span className="field-label">Longitude</span>
+                          <input className="input" value={item.lng} onChange={(e) => patchLocation(index, { lng: e.target.value })} placeholder="69.2848" />
+                        </label>
+                      </div>
+                      <label>
+                        <span className="field-label">Zoom</span>
+                        <input className="input" value={item.zoom} onChange={(e) => patchLocation(index, { zoom: e.target.value })} placeholder="16" />
+                      </label>
+                    </div>
+                  ))}
+                  <button type="button" className="btn btn-outline" onClick={() => setMapLocations([...mapLocations, emptyLocation()])}>
+                    + Yangi manzil qo'shish
+                  </button>
+                </div>
+              </div>
+            )}
+
             {visible.map(({ row, idx }) => {
+              if (row.key === MAP_LOCATIONS_KEY) return null;
               const isRaw = row.value_uz === null && row.value_ru === null && row.value_en === null;
               const valueKey = ('value_' + locale) as 'value_uz' | 'value_ru' | 'value_en';
+              const useTextarea = row.key === 'contact.address';
+              const helpText = useTextarea
+                ? "Bir nechta manzilni yangi qatordan yoki | belgisi bilan ajrating. Masalan: Manzil 1 | Manzil 2"
+                : row.description;
               return (
                 <div key={row.key} className="card">
                   <div className="between" style={{ marginBottom: 8 }}>
@@ -103,22 +253,37 @@ export default function SettingsPage() {
                     </button>
                   </div>
 
+                  {helpText && (
+                    <p className="muted" style={{ fontSize: '0.82rem', marginBottom: 8, marginTop: -2 }}>
+                      {helpText}
+                    </p>
+                  )}
+
                   {isRaw ? (
                     <>
                       <span className="field-label">Qiymat (barcha tillarda bir xil)</span>
-                      <input
-                        className="input"
-                        value={row.value_raw ?? ''}
-                        onChange={(e) => update(idx, { value_raw: e.target.value })}
-                      />
+                      {useTextarea ? (
+                        <textarea
+                          className="textarea"
+                          rows={4}
+                          value={row.value_raw ?? ''}
+                          onChange={(e) => update(idx, { value_raw: e.target.value })}
+                        />
+                      ) : (
+                        <input
+                          className="input"
+                          value={row.value_raw ?? ''}
+                          onChange={(e) => update(idx, { value_raw: e.target.value })}
+                        />
+                      )}
                     </>
                   ) : (
                     <>
                       <span className="field-label">Qiymat ({locale})</span>
-                      {(row[valueKey] || '').length > 80 ? (
+                      {useTextarea || (row[valueKey] || '').length > 80 ? (
                         <textarea
                           className="textarea"
-                          rows={3}
+                          rows={useTextarea ? 4 : 3}
                           value={row[valueKey] ?? ''}
                           onChange={(e) => update(idx, { [valueKey]: e.target.value } as any)}
                         />

@@ -59,7 +59,6 @@ export default async function MashPage({ params }: { params: { locale: string } 
               );
             })}
           </div>
-          <p className="grant-desc reveal">{dict.sections.mash_grant_desc}</p>
         </div>
       </section>
 
@@ -91,7 +90,7 @@ export default async function MashPage({ params }: { params: { locale: string } 
                   <p className="mash-exam-note">{c.note}</p>
                   <div style={{ marginTop: 'auto', display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                     <Link href={`/${locale}/${examDetailSlug(c.badge)}`} className="btn btn-primary">Batafsil →</Link>
-                    <Link href={`/${locale}/aloqa`} className="btn btn-outline" style={{ borderColor: 'var(--navy-10)' }}>{c.cta_label}</Link>
+                    <button type="button" className="btn btn-outline" style={{ borderColor: 'var(--navy-10)' }} data-popup-open>{c.cta_label}</button>
                   </div>
                 </div>
               </div>
@@ -139,11 +138,6 @@ export default async function MashPage({ params }: { params: { locale: string } 
                 <div className="mash-extra-body">
                   <h3>{ex.title}</h3>
                   <p dangerouslySetInnerHTML={{ __html: ex.description || '' }} />
-                  {ex.link_url && (
-                    <a href={ex.link_url} target="_blank" rel="noopener noreferrer" className="text-link">
-                      {ex.link_label || dict.see_video}
-                    </a>
-                  )}
                 </div>
                 <div className="mash-extra-visual">
                   {ex.image_url

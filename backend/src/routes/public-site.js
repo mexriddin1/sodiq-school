@@ -85,7 +85,7 @@ router.get('/', async (req, res) => {
        ORDER BY er.sort_order ASC`, [locale]),
 
     query(
-      `SELECT a.id, a.icon_key, a.image_id, a.gold_count, a.silver_count, a.bronze_count,
+      `SELECT a.id, a.icon_key, a.image_id, a.video_url, a.gold_count, a.silver_count, a.bronze_count,
               a.total_label_value, a.sort_order, m.url AS image_url,
               at.title, at.description, at.gold_label, at.silver_label, at.bronze_label, at.total_label
        FROM awards a

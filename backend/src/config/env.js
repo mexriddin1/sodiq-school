@@ -29,6 +29,24 @@ export const env = {
   },
   uploadDir: process.env.UPLOAD_DIR || 'uploads',
   publicBaseUrl: process.env.PUBLIC_BASE_URL || 'http://localhost:4000',
+  mail: {
+    smtpHost: process.env.SMTP_HOST || '',
+    smtpPort: parseInt(process.env.SMTP_PORT || '587', 10),
+    smtpSecure: process.env.SMTP_SECURE === 'true',
+    smtpUser: process.env.SMTP_USER || '',
+    smtpPass: process.env.SMTP_PASS || '',
+    from: process.env.SMTP_FROM || process.env.SMTP_USER || '',
+    leadNotifyTo: (process.env.LEAD_NOTIFY_TO || 'scaleup.corporate@gmail.com')
+      .split(',')
+      .map((email) => email.trim())
+      .filter(Boolean),
+  },
+  metaCapi: {
+    pixelId: process.env.META_PIXEL_ID || '',
+    accessToken: process.env.META_CAPI_ACCESS_TOKEN || '',
+    testEventCode: process.env.META_TEST_EVENT_CODE || '',
+    debug: process.env.META_CAPI_DEBUG === 'true',
+  },
   locales: ['uz', 'ru', 'en'],
   defaultLocale: 'uz',
 };

@@ -11,10 +11,11 @@ type Props = {
   pageDesc: string;
   stats: Array<{ num: string; label: string }>;
   ctaTitle: string;
+  showMap?: boolean;
 };
 
 export async function ExamCoursePage({
-  locale, badge, pageTitle, pageDesc, stats, ctaTitle,
+  locale, badge, pageTitle, pageDesc, stats, ctaTitle, showMap = false,
 }: Props) {
   const dict = getDict(locale);
   const [bundle, sectionsResp] = await Promise.all([
@@ -50,7 +51,7 @@ export async function ExamCoursePage({
                   </div>
                 ))}
               </div>
-              <Link href={`/${locale}/aloqa`} className="btn btn-primary btn-large">Bepul konsultatsiya →</Link>
+              <button type="button" className="btn btn-primary btn-large" data-popup-open>Bepul konsultatsiya →</button>
             </div>
             <div className={`md-page-logo-card ${themeClass}`}>
               <img src={logoUrl} alt={badge} />
@@ -75,7 +76,7 @@ export async function ExamCoursePage({
         </div>
       </section>
 
-      <CtaBanner locale={locale} settings={s} variant="compact" customTitle={ctaTitle}
+      <CtaBanner locale={locale} settings={s} variant="compact" showMap={showMap} customTitle={ctaTitle}
         customSubtitle="Raqamingizni qoldiring — biz 24 soat ichida bog'lanamiz." />
     </>
   );

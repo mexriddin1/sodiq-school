@@ -113,6 +113,7 @@ export const awardsConfig: EntityConfig = {
       { value: 'star', label: 'Yulduz (olimpiada)' },
       { value: 'karate', label: 'Karate' },
     ]},
+    { name: 'video_url', label: 'Video URL (YouTube)', type: 'text', help: 'YouTube link kiriting. Bo\'sh bo\'lsa rasm ko\'rinadi.' },
     { name: 'gold_count', label: 'Oltin soni', type: 'number' },
     { name: 'silver_count', label: 'Kumush soni', type: 'number' },
     { name: 'bronze_count', label: 'Bronza soni', type: 'number' },

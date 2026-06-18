@@ -46,9 +46,9 @@ export async function seedAwards(mediaMap = {}) {
     const mediaKey = iconToMedia[a.icon_key];
     const imageId = mediaKey ? mediaMap[mediaKey] : null;
     const r = await query(
-      `INSERT INTO awards (icon_key, image_id, gold_count, silver_count, bronze_count, total_label_value, sort_order, is_published)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
-      [a.icon_key, imageId, a.gold, a.silver, a.bronze, a.total_label_value, a.sort],
+      `INSERT INTO awards (icon_key, image_id, video_url, gold_count, silver_count, bronze_count, total_label_value, sort_order, is_published)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)`,
+      [a.icon_key, imageId, a.video_url ?? null, a.gold, a.silver, a.bronze, a.total_label_value, a.sort],
     );
     const id = r.insertId;
     for (const [locale, tr] of Object.entries(a.tr)) {

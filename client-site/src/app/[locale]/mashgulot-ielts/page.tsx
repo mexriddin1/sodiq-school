@@ -30,6 +30,7 @@ export default async function Page({ params }: { params: { locale: string } }) {
       pageDesc={s['mash_ielts.page_desc'] || ''}
       stats={stats}
       ctaTitle={s['mash_ielts.cta_title'] || 'IELTS kursiga yozilish'}
+      showMap
     />
   );
 }

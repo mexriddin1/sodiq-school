@@ -6,7 +6,7 @@ import { PageHeader } from '@/components/PageHeader';
 
 type App = {
   id: number; name: string; phone: string; message: string | null;
-  grade: string | null; status: 'new'|'contacted'|'closed'; notes: string | null;
+  age: string | null; grade: string | null; region: string | null; status: 'new'|'contacted'|'closed'; notes: string | null;
   source_form: string; created_at: string;
 };
 
@@ -65,7 +65,7 @@ export default function ApplicationsPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>#</th><th>Sana</th><th>Ism</th><th>Telefon</th><th>Sinf</th><th>Habar</th>
+                  <th>#</th><th>Sana</th><th>Ism</th><th>Telefon</th><th>Yosh</th><th>Sinf</th><th>Viloyat</th><th>Habar</th>
                   <th>Manba</th><th>Status</th><th className="right">Amal</th>
                 </tr>
               </thead>
@@ -76,7 +76,9 @@ export default function ApplicationsPage() {
                     <td>{a.created_at}</td>
                     <td><strong>{a.name}</strong></td>
                     <td><a href={`tel:${a.phone}`}>{a.phone}</a></td>
+                    <td>{a.age || '-'}</td>
                     <td>{a.grade || '—'}</td>
+                    <td>{a.region || '—'}</td>
                     <td style={{ maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.message || '—'}</td>
                     <td><span className="pill pill-gray">{a.source_form}</span></td>
                     <td>
