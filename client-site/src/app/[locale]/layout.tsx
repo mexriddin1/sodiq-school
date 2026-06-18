@@ -7,6 +7,7 @@ import { ScrollProgress } from '@/components/ScrollProgress';
 import { GlobalScripts } from '@/components/GlobalScripts';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { fetchSiteBundle } from '@/lib/api';
+import {PopupForm} from "@/components/PopupForm";
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
