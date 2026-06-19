@@ -127,6 +127,7 @@ ul, ol { list-style: none; }
 .topbar .actions { display: flex; gap: 10px; }
 
 main.content { padding: 28px; max-width: 1280px; }
+main.content.applications-content { max-width: none; }
 
 /* Card */
 .card {
@@ -233,6 +234,48 @@ main.content { padding: 28px; max-width: 1280px; }
 .table tbody tr { border-top: 1px solid var(--line-soft); }
 .table tbody tr:hover { background: var(--bg); }
 .table .row-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.applications-table .table {
+  min-width: 1180px;
+  font-size: 0.84rem;
+}
+.applications-table .table th,
+.applications-table .table td {
+  padding: 11px 12px;
+  vertical-align: top;
+}
+.applications-table .row-actions {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  min-width: 178px;
+}
+.lead-name,
+.lead-phone {
+  display: block;
+  white-space: nowrap;
+}
+.lead-phone {
+  margin-top: 4px;
+  color: var(--text-soft);
+  font-size: 0.8rem;
+}
+.lead-stack,
+.utm-cell {
+  display: grid;
+  gap: 4px;
+}
+.utm-cell {
+  min-width: 180px;
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+.utm-cell b { color: var(--navy); }
+.message-cell {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nowrap { white-space: nowrap; }
 
 .thumb { width: 48px; height: 48px; border-radius: 8px; background: var(--bg) center/cover no-repeat; flex-shrink: 0; border: 1px solid var(--line); }
 .id-cell { font-family: ui-monospace, SFMono-Regular, monospace; font-size: 0.75rem; color: var(--text-soft); }
