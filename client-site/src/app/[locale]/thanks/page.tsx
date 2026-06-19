@@ -29,6 +29,7 @@ export default function ThanksPage({ params }: { params: { locale: string } }) {
   if (!isLocale(params.locale)) notFound();
   const locale = params.locale as Locale;
   const t = COPY[locale] || COPY.uz;
+  const telegramLabel = locale === 'en' ? 'Contact on Telegram' : locale === 'ru' ? 'Telegram' : "Telegram orqali bog'lanish";
 
   return (
     <>
@@ -43,6 +44,11 @@ export default function ThanksPage({ params }: { params: { locale: string } }) {
         </div>
         <h1>{t.title}</h1>
         <p>{t.body}</p>
+        <div className="thanks-actions">
+          <a className="btn btn-primary" href="https://t.me/sodiqschool1" target="_blank" rel="noopener noreferrer" data-popup-skip="true">
+            {telegramLabel}
+          </a>
+        </div>
       </main>
     </>
   );
