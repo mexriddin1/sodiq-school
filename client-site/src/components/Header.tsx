@@ -11,7 +11,9 @@ export function Header({ locale, settings }: { locale: Locale; settings: Record<
   const dict = getDict(locale);
   const pathname = usePathname();
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
+  const isThanks = pathname === `/${locale}/thanks` || pathname === `/${locale}/thanks/`;
   const isLanding = pathname === `/${locale}/short-landing` || pathname === `/${locale}/long-landing` || pathname === `/${locale}/imtixon-1july`;
+  const isMinimalHeader = isLanding || isThanks;
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -24,7 +26,7 @@ export function Header({ locale, settings }: { locale: Locale; settings: Record<
 
   // Inner pages (everything except home) get the "solid" header always.
   const isSolid = !isHome;
-  const headerClass = ['header', isSolid && 'solid', scrolled && 'scrolled', isLanding && 'header--landing'].filter(Boolean).join(' ');
+  const headerClass = ['header', isSolid && 'solid', scrolled && 'scrolled', isMinimalHeader && 'header--landing'].filter(Boolean).join(' ');
   const phone = settings['contact.phone'] || '+998 78 888 80 80';
   const phoneLink = settings['contact.phone_link'] || phone.replace(/\D/g, '');
 
@@ -51,7 +53,7 @@ export function Header({ locale, settings }: { locale: Locale; settings: Record<
           lightUrl={settings['brand.logo_light_url']}
           darkUrl={settings['brand.logo_dark_url']}
         />
-        {!isLanding && (
+        {!isMinimalHeader && (
           <nav className={'nav' + (open ? ' open' : '')} id="nav">
             {links.map((l) => (
               <Link
@@ -69,7 +71,7 @@ export function Header({ locale, settings }: { locale: Locale; settings: Record<
         <div className="header-cta">
           <LanguageSwitcher current={locale} />
           <a className="btn btn-primary header-phone" href={`tel:${phoneLink}`}>{phone}</a>
-          {!isLanding && (
+          {!isMinimalHeader && (
             <button
               className={'hamburger' + (open ? ' open' : '')}
               id="hamburger"
