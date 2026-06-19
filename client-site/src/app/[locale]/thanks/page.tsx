@@ -1,29 +1,25 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { isLocale, type Locale } from '@/i18n/config';
 
-const COPY: Record<string, { title: string; body: string; back: string }> = {
+const COPY: Record<string, { title: string; body: string }> = {
   uz: {
     title: "Rahmat, ma'lumotingiz uchun!",
     body: "Arizangiz qabul qilindi. Operatorimiz eng qisqa vaqt ichida siz bilan bog'lanadi.",
-    back: 'Bosh sahifaga qaytish',
   },
   ru: {
     title: 'Спасибо за вашу информацию!',
     body: 'Ваша заявка принята. Наш оператор свяжется с вами в ближайшее время.',
-    back: 'Вернуться на главную',
   },
   en: {
     title: 'Thank you for your information!',
     body: 'Your request has been received. Our operator will contact you shortly.',
-    back: 'Back to home',
   },
 };
 
 export function generateMetadata(): Metadata {
   return {
-    title: 'Thank you — Sodiq School',
+    title: 'Thank you - Sodiq School',
     robots: { index: false, follow: false },
   };
 }
@@ -42,9 +38,6 @@ export default function ThanksPage({ params }: { params: { locale: string } }) {
       </div>
       <h1>{t.title}</h1>
       <p>{t.body}</p>
-      <Link href={`/${locale}`} className="btn btn-primary btn-large" data-popup-skip="true">
-        {t.back}
-      </Link>
     </main>
   );
 }

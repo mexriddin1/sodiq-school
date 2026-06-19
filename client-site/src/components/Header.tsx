@@ -11,6 +11,7 @@ export function Header({ locale, settings }: { locale: Locale; settings: Record<
   const dict = getDict(locale);
   const pathname = usePathname();
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
+  const isThanks = pathname === `/${locale}/thanks` || pathname === `/${locale}/thanks/`;
   const isLanding = pathname === `/${locale}/short-landing` || pathname === `/${locale}/long-landing` || pathname === `/${locale}/imtixon-1july`;
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -21,6 +22,8 @@ export function Header({ locale, settings }: { locale: Locale; settings: Record<
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  if (isThanks) return null;
 
   // Inner pages (everything except home) get the "solid" header always.
   const isSolid = !isHome;
