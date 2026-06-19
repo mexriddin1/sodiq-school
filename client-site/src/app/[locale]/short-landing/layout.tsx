@@ -3,7 +3,7 @@ import Script from 'next/script';
 export default function ShortLandingLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      {/* Telegram Pixel (init only — Lead event fires from form success via fireTelegramLead) */}
+      {/* Telegram Pixel init only. Lead events are fired from the thank-you page. */}
       <Script id="telegram-pixel" strategy="afterInteractive">
         {`(function(t,l,g,r,m){t[g]||(g=t[g]=function(){g.run?g.run.apply(g,arguments):g.queue.push(arguments)},g.queue=[],t=l.createElement(r),t.async=!0,t.src=m,l=l.getElementsByTagName(r)[0],l.parentNode.insertBefore(t,l))})(window,document,'tgp','script','https://telegram.org/js/pixel.js');tgp('init','bjPNOpBd');`}
       </Script>

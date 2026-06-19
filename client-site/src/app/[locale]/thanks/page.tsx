@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { notFound } from 'next/navigation';
 import { isLocale, type Locale } from '@/i18n/config';
 
@@ -30,14 +31,19 @@ export default function ThanksPage({ params }: { params: { locale: string } }) {
   const t = COPY[locale] || COPY.uz;
 
   return (
-    <main className="thanks-page">
-      <div className="thanks-check" aria-hidden="true">
-        <svg viewBox="0 0 64 64" width="80" height="80" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M14 33 L27 46 L50 21" />
-        </svg>
-      </div>
-      <h1>{t.title}</h1>
-      <p>{t.body}</p>
-    </main>
+    <>
+      <Script id="telegram-lead-thanks" strategy="afterInteractive">
+        {`if(new URLSearchParams(window.location.search).get('tg')==='imtixon-1july'){(function(t,l,g,r,m){t[g]||(g=t[g]=function(){g.run?g.run.apply(g,arguments):g.queue.push(arguments)},g.queue=[],t=l.createElement(r),t.async=!0,t.src=m,l=l.getElementsByTagName(r)[0],l.parentNode.insertBefore(t,l))})(window,document,'tgp','script','https://telegram.org/js/pixel.js');tgp('init','bjPNOpBd');tgp('event','bjPNOpBd-wozq1aBm');}`}
+      </Script>
+      <main className="thanks-page">
+        <div className="thanks-check" aria-hidden="true">
+          <svg viewBox="0 0 64 64" width="80" height="80" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 33 L27 46 L50 21" />
+          </svg>
+        </div>
+        <h1>{t.title}</h1>
+        <p>{t.body}</p>
+      </main>
+    </>
   );
 }

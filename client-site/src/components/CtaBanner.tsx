@@ -1,10 +1,9 @@
 'use client';
 import { useRef, useState, type FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { Locale } from '@/i18n/config';
 import { getDict } from '@/i18n/dictionaries';
 import { submitApplication } from '@/lib/api';
-import { fireTelegramLead } from '@/lib/telegram';
 import { fireMetaLead, generateEventId, getMetaCookies } from '@/lib/meta-pixel';
 import { firstContactAddress, splitContactAddresses } from '@/lib/contact';
 import { GRADE_OPTIONS, UZBEKISTAN_REGIONS } from '@/lib/form-options';
@@ -105,6 +104,7 @@ export function CtaBanner({
     : 'map-count-many';
 
   const router = useRouter();
+  const pathname = usePathname();
   const [busy, setBusy] = useState(false);
   const leadFired = useRef(false);
 
@@ -124,7 +124,6 @@ export function CtaBanner({
     const { fbp, fbc } = getMetaCookies();
     if (!leadFired.current) {
       fireMetaLead(eventId);
-      fireTelegramLead();
       leadFired.current = true;
     }
     try {
@@ -141,7 +140,8 @@ export function CtaBanner({
       console.error(err);
     } finally {
       form.reset();
-      router.push(`/${locale}/thanks`);
+      const fromExamLanding = pathname?.includes('/imtixon-1july') || pathname?.includes('/imtixon-1iyul');
+      router.push(`/${locale}/thanks${fromExamLanding ? '?tg=imtixon-1july' : ''}`);
     }
   }
 
