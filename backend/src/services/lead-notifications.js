@@ -4,7 +4,7 @@ let transporterPromise;
 let warnedMissingSmtp = false;
 
 function isConfigured() {
-  return Boolean(env.mail.smtpHost && env.mail.from && env.mail.leadNotifyTo.length);
+  return Boolean(env.mail && env.mail.smtpHost && env.mail.from && env.mail.leadNotifyTo && env.mail.leadNotifyTo.length);
 }
 
 async function getTransporter() {
@@ -32,6 +32,13 @@ function leadText(lead) {
     `Yosh: ${lead.age || '-'}`,
     `Sinf: ${lead.grade || '-'}`,
     `Viloyat: ${lead.region || '-'}`,
+    `UTM source: ${lead.utm_source || '-'}`,
+    `UTM medium: ${lead.utm_medium || '-'}`,
+    `UTM campaign: ${lead.utm_campaign || '-'}`,
+    `UTM term: ${lead.utm_term || '-'}`,
+    `UTM content: ${lead.utm_content || '-'}`,
+    `Landing page: ${lead.landing_page || '-'}`,
+    `Referrer: ${lead.referrer || '-'}`,
     `Xabar: ${lead.message || '-'}`,
   ].join('\n');
 }
@@ -53,6 +60,13 @@ function leadHtml(lead) {
       <tr><td><strong>Yosh</strong></td><td>${esc(lead.age)}</td></tr>
       <tr><td><strong>Sinf</strong></td><td>${esc(lead.grade)}</td></tr>
       <tr><td><strong>Viloyat</strong></td><td>${esc(lead.region)}</td></tr>
+      <tr><td><strong>UTM source</strong></td><td>${esc(lead.utm_source)}</td></tr>
+      <tr><td><strong>UTM medium</strong></td><td>${esc(lead.utm_medium)}</td></tr>
+      <tr><td><strong>UTM campaign</strong></td><td>${esc(lead.utm_campaign)}</td></tr>
+      <tr><td><strong>UTM term</strong></td><td>${esc(lead.utm_term)}</td></tr>
+      <tr><td><strong>UTM content</strong></td><td>${esc(lead.utm_content)}</td></tr>
+      <tr><td><strong>Landing page</strong></td><td>${esc(lead.landing_page)}</td></tr>
+      <tr><td><strong>Referrer</strong></td><td>${esc(lead.referrer)}</td></tr>
       <tr><td><strong>Xabar</strong></td><td>${esc(lead.message)}</td></tr>
     </table>
   `;

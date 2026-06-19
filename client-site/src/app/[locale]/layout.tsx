@@ -8,6 +8,7 @@ import { GlobalScripts } from '@/components/GlobalScripts';
 import { ScrollToTop } from '@/components/ScrollToTop';
 import { fetchSiteBundle } from '@/lib/api';
 import {PopupForm} from "@/components/PopupForm";
+import { UtmCapture } from '@/components/UtmCapture';
 
 export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
@@ -34,6 +35,7 @@ export default async function LocaleLayout({
   return (
     <>
       <LocaleSetter locale={locale} />
+      <UtmCapture />
       <ScrollProgress />
       <Header locale={locale} settings={bundle?.settings || {}} />
       {children}

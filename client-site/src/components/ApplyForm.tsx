@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import type { Locale } from '@/i18n/config';
 import { getDict } from '@/i18n/dictionaries';
 import { submitApplication } from '@/lib/api';
+import { getUtm } from '@/lib/utm';
 import { fireMetaLead, generateEventId, getMetaCookies } from '@/lib/meta-pixel';
 import { GRADE_OPTIONS, UZBEKISTAN_REGIONS } from '@/lib/form-options';
 
@@ -36,6 +37,7 @@ export function ApplyForm({ locale, variant = 'full' }: { locale: Locale; varian
     }
     try {
       await submitApplication({
+        ...getUtm(),
         name, phone,
         message: message || undefined,
         grade: grade || undefined,

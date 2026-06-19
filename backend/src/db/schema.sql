@@ -487,6 +487,13 @@ CREATE TABLE application_submissions (
   age VARCHAR(40),
   grade VARCHAR(20),
   region VARCHAR(120),
+  utm_source VARCHAR(120),
+  utm_medium VARCHAR(120),
+  utm_campaign VARCHAR(120),
+  utm_term VARCHAR(120),
+  utm_content VARCHAR(120),
+  referrer VARCHAR(500),
+  landing_page VARCHAR(500),
   status ENUM('new','contacted','closed') NOT NULL DEFAULT 'new',
   notes TEXT,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP

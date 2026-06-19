@@ -107,6 +107,8 @@ export async function fetchTeacherBySlug(slug: string, locale: Locale): Promise<
 export async function submitApplication(payload: {
   name: string; phone: string; message?: string; age?: string; grade?: string; region?: string; source_form?: string;
   event_id?: string; fbp?: string; fbc?: string;
+  utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_term?: string; utm_content?: string;
+  referrer?: string; landing_page?: string;
 }): Promise<void> {
   await apiFetch<{ ok: boolean }>(`/api/applications`, {
     method: 'POST', body: JSON.stringify(payload),
