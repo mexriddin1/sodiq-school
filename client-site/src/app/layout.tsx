@@ -19,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="uz">
       <head>
+        <meta name="facebook-domain-verification" content="8yyof2mh4hvxiailne77jcxpkptr5m" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
