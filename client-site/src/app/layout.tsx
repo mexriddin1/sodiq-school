@@ -20,6 +20,8 @@ export default function RootLayout({
     <html lang="uz">
       <head>
         <meta name="facebook-domain-verification" content="8yyof2mh4hvxiailne77jcxpkptr5m" />
+        <link rel="preload" as="image" href="/images/hero-bg-900.jpg" media="(max-width: 900px)" />
+        <link rel="preload" as="image" href="/images/hero-bg-1600.jpg" media="(min-width: 901px)" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

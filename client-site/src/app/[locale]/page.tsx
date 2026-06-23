@@ -60,6 +60,13 @@ const examLandingAdvantages = [
 
 type HomeVariant = 'default' | 'exam-1july';
 
+const uzDefaultHero = {
+  pill: 'Qabul imtihoni',
+  title: <>2500 ariza, 450 qabul va $20M+ natija. Navbat sizning farzandingizga keldimi?</>,
+  lead: "Har yili intiluvchan o'quvchilarni tanlab olib, ulardan o'z yo'nalishining yetakchilarini tayyorlaymiz. Farzandingiz bizning ta'limga mos keladimi? Keling, buni imtihonda birgalikda sinab ko'ramiz.",
+  cta: 'Imtihonga joy band qilish',
+};
+
 export async function HomeContent({
   params,
   variant = 'default',
@@ -82,6 +89,8 @@ export async function HomeContent({
         lead: 'Sodiq School da 2026-2027 BEPUL qabul imtixoniga farzandingizni yozdiring va farzandingiz aniq bilimini bilib oling.',
         cta: 'Ariza qoldirish',
       }
+    : locale === 'uz'
+      ? uzDefaultHero
     : {
         pill: s['hero.pill'],
         title: <>{s['hero.title_main']} <span className="accent">{s['hero.title_accent']}</span> {s['hero.title_suffix']}</>,
