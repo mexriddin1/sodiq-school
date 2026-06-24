@@ -19,9 +19,22 @@ export default function RootLayout({
   return (
     <html lang="uz">
       <head>
-        <meta name="facebook-domain-verification" content="8yyof2mh4hvxiailne77jcxpkptr5m" />
-        <link rel="preload" as="image" href="/images/hero-bg-900.jpg" media="(max-width: 900px)" />
-        <link rel="preload" as="image" href="/images/hero-bg-1600.jpg" media="(min-width: 901px)" />
+        <meta
+          name="facebook-domain-verification"
+          content="8yyof2mh4hvxiailne77jcxpkptr5m"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/images/hero-bg-900.jpg"
+          media="(max-width: 900px)"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/images/hero-bg-1600.jpg"
+          media="(min-width: 901px)"
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -34,7 +47,27 @@ export default function RootLayout({
         />
       </head>
       <body>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-T2T3KWW2"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+        {/* End Google Tag Manager (noscript) */}
+
         {children}
+
+        {/* Google Tag Manager - Head Script */}
+        <Script id="gtm-script" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-T2T3KWW2');`}
+        </Script>
 
         {/* Skriptlar body oxiriga ko'chirildi — bu sayt tezligini oshiradi */}
         <Script
