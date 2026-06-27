@@ -180,7 +180,7 @@ const uz: Dict = {
   meta: {
     home_title: 'Sodiq School — Toshkentdagi yetakchi xususiy maktab',
     home_desc: "Sodiq School — 7-11 sinf o'quvchilarini dunyo TOP universitetlariga tayyorlovchi Toshkentdagi yetakchi xususiy maktab.",
-    about_title: 'Biz haqimizda — Sodiq School',
+    about_title: 'Sodiq School Haqida – Xalqaro Taʼlim Standartlari va Maqsadlar',
     about_desc: 'Sodiq School — 2022-yilda Toshkentda tashkil etilgan. 239 bitiruvchimiz Harvard, NYU, University of Chicago kabi TOP universitetlarda.',
     natijalar_title: "O'quvchilar natijalari — Sodiq School",
     natijalar_desc: 'Sodiq School o\'quvchilarining IELTS, SAT imtihonlaridagi yutuqlari va xorijiy universitetlardagi bitiruvchilarimiz.',

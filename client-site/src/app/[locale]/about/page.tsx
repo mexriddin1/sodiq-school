@@ -2,14 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Locale } from "@/i18n/config";
-import { isLocale, LOCALES } from "@/i18n/config"; // LOCALES qo'shildi
+import { isLocale, LOCALES } from "@/i18n/config";
 import { getDict } from "@/i18n/dictionaries";
 import { fetchSiteBundle, resolveMediaUrl, API_BASE } from "@/lib/api";
 import { PageHero } from "@/components/PageHero";
 import { TestimonialVideos } from "@/components/TestimonialVideos";
 import { CtaBanner } from "@/components/CtaBanner";
 
-// 1. "Haqida" sahifasi uchun maxsus ko'p tilli SEO bazasi
 const aboutSeoData: Record<
   string,
   { title: string; description: string; keywords: string[] }
@@ -56,20 +55,21 @@ const aboutSeoData: Record<
   },
 };
 
-// 2. Next.js 15 versiyasi bilan ham 100% xavfsiz va mukammal SEO funksiyasi
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }> | { locale: string };
-}): Promise<Metadata> {
+// Next.js 15 uchun params turi aniq Promise bo'lishi kerak
+type Props = {
+  params: Promise<{ locale: string }>;
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
   if (!isLocale(resolvedParams.locale)) return {};
 
   const locale = resolvedParams.locale || "uz";
   const currentSeo = aboutSeoData[locale] || aboutSeoData.uz;
 
-  const baseUrl = "https://sodiqschool.uz/uz";
-  const currentUrl = `${baseUrl}/${locale}/about`;
+  // TUZATILDI: Domendagi ortiqcha "/uz" olib tashlandi
+  const siteUrl = "https://sodiqschool.uz";
+  const currentUrl = `${siteUrl}/${locale}/about`;
 
   return {
     title: currentSeo.title,
@@ -89,9 +89,11 @@ export async function generateMetadata({
     alternates: {
       canonical: currentUrl,
       languages: {
-        "uz-UZ": `${baseUrl}/uz/about`,
-        "ru-RU": `${baseUrl}/ru/about`,
-        "en-US": `${baseUrl}/en/about`,
+        // TUZATILDI: tillar havolalari to'g'rilandi
+        "uz-UZ": `${siteUrl}/uz/about`,
+        "ru-RU": `${siteUrl}/ru/about`,
+        "en-US": `${siteUrl}/en/about`,
+        "x-default": `${siteUrl}/uz/about`, // SEO Tavsiyasi
       },
     },
 
@@ -104,7 +106,9 @@ export async function generateMetadata({
       locale: locale === "uz" ? "uz_UZ" : locale === "ru" ? "ru_RU" : "en_US",
       images: [
         {
-          url: `${baseUrl}/images/hero-bg.png`,
+          url: `${siteUrl}/images/hero-bg.png`, // TO'G'RILANDI
+          width: 1200,
+          height: 630,
         },
       ],
     },
@@ -113,7 +117,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: currentSeo.title,
       description: currentSeo.description,
-      images: [`${baseUrl}/images/hero-bg.png`],
+      images: [`${siteUrl}/images/hero-bg.png`], // TO'G'RILANDI
     },
   };
 }
@@ -122,13 +126,10 @@ export function generateStaticParams() {
   return LOCALES.map((locale) => ({ locale }));
 }
 
-export default async function AboutPage({
-  params,
-}: {
-  params: Promise<{ locale: string }> | { locale: string }; // Next.js 15+ uchun xavfsiz tip
-}) {
+export default async function AboutPage({ params }: Props) {
   const resolvedParams = await params;
   if (!isLocale(resolvedParams.locale)) notFound();
+
   const locale = resolvedParams.locale as Locale;
   const dict = getDict(locale);
   const bundle = await fetchSiteBundle(locale);
@@ -143,7 +144,7 @@ export default async function AboutPage({
         lead={s["about_page.hero_lead"] || ""}
       />
 
-      {/* BIZ KIMMIZ — home page bilan bir xil stacked layout */}
+      {/* BIZ KIMMIZ */}
       <section className="about about-stacked" id="about">
         <div className="container">
           <div className="about-text">
@@ -163,8 +164,9 @@ export default async function AboutPage({
                     <div className="val">
                       {st.prefix}
                       {numeric ? (
+                        // TUZATILDI: SEO robotlari 0 ni emas, haqiqiy qiymatni o'qiydi
                         <span className="cu" data-target={st.value}>
-                          0
+                          {st.value}
                         </span>
                       ) : (
                         st.value
@@ -179,7 +181,7 @@ export default async function AboutPage({
         </div>
       </section>
 
-      {/* MISSION — yangi 2 ustunli struktura (home page bilan bir xil) */}
+      {/* MISSION */}
       <section className="mission mission-v2">
         <div className="container">
           <div className="mission-grid">
@@ -187,7 +189,7 @@ export default async function AboutPage({
               <h2 className="mission-title">
                 <span className="mission-title-brand">
                   {s["mission.title_brand"]}
-                </span>
+                </span>{" "}
                 <span className="mission-title-accent">
                   {s["mission.title_accent"]}
                 </span>
