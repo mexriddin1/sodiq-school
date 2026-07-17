@@ -18,7 +18,7 @@ export function GlobalScripts() {
     const body = document.body;
     body.classList.remove('landing-page', 'landing-short', 'landing-long');
     if (pathname?.includes('/short-landing')) body.classList.add('landing-page', 'landing-short');
-    else if (pathname?.includes('/long-landing') || pathname?.includes('/imtixon-1july')) body.classList.add('landing-page', 'landing-long');
+    else if (pathname?.includes('/long-landing') || pathname?.includes('/imtixon-1avgust')) body.classList.add('landing-page', 'landing-long');
 
     // small delay so the DOM is fully painted before observers attach
     const t = setTimeout(init, 30);

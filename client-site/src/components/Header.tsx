@@ -12,7 +12,7 @@ export function Header({ locale, settings }: { locale: Locale; settings: Record<
   const pathname = usePathname();
   const isHome = pathname === `/${locale}` || pathname === `/${locale}/`;
   const isThanks = pathname === `/${locale}/thanks` || pathname === `/${locale}/thanks/`;
-  const isLanding = pathname === `/${locale}/short-landing` || pathname === `/${locale}/long-landing` || pathname === `/${locale}/imtixon-1july`;
+  const isLanding = pathname === `/${locale}/short-landing` || pathname === `/${locale}/long-landing` || pathname === `/${locale}/imtixon-1avgust`;
   const isMinimalHeader = isLanding || isThanks;
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);

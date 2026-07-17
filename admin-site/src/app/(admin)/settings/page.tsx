@@ -11,9 +11,13 @@ type SettingRow = {
   value_raw: string | null;
 };
 
+// Name/address are per-locale; coordinates are shared, so they stay flat and there
+// is only ever one source of truth for a pin's position.
+type LocaleText = { uz: string; ru: string; en: string };
+
 type MapLocation = {
-  name: string;
-  address: string;
+  name: LocaleText;
+  address: LocaleText;
   lat: string;
   lng: string;
   zoom: string;
@@ -21,8 +25,27 @@ type MapLocation = {
 
 const MAP_LOCATIONS_KEY = 'contact.map_locations';
 
+function emptyLocaleText(): LocaleText {
+  return { uz: '', ru: '', en: '' };
+}
+
 function emptyLocation(): MapLocation {
-  return { name: '', address: '', lat: '', lng: '', zoom: '16' };
+  return { name: emptyLocaleText(), address: emptyLocaleText(), lat: '', lng: '', zoom: '16' };
+}
+
+// Older rows stored a single string per field. Read it into all three locales so the
+// admin sees the existing text on every tab instead of losing it on the next save.
+function toLocaleText(value: unknown): LocaleText {
+  if (typeof value === 'string') return { uz: value, ru: value, en: value };
+  if (value && typeof value === 'object') {
+    const v = value as Record<string, unknown>;
+    return {
+      uz: String(v.uz || ''),
+      ru: String(v.ru || ''),
+      en: String(v.en || ''),
+    };
+  }
+  return emptyLocaleText();
 }
 
 function parseLocations(value?: string | null): MapLocation[] {
@@ -31,8 +54,8 @@ function parseLocations(value?: string | null): MapLocation[] {
     const parsed = JSON.parse(value);
     if (!Array.isArray(parsed)) return [];
     return parsed.map((item) => ({
-      name: String(item?.name || ''),
-      address: String(item?.address || ''),
+      name: toLocaleText(item?.name),
+      address: toLocaleText(item?.address),
       lat: String(item?.lat || ''),
       lng: String(item?.lng || ''),
       zoom: String(item?.zoom || '16'),
@@ -173,7 +196,7 @@ export default function SettingsPage() {
                   <div>
                     <h3 style={{ margin: 0 }}>Map manzillar</h3>
                     <p className="muted" style={{ margin: '6px 0 0', fontSize: '0.82rem' }}>
-                      Har bir manzilni alohida yarating. Nomi, manzili va koordinatasi saytdagi map gridda chiqadi.
+                      Har bir manzilni alohida yarating. Nomi va manzili har bir til uchun alohida — yuqoridagi til tab'ini almashtirib to'ldiring. Koordinata va zoom barcha tillar uchun umumiy.
                     </p>
                   </div>
                   <button
@@ -200,12 +223,22 @@ export default function SettingsPage() {
                       </div>
                       <div className="field-row">
                         <label>
-                          <span className="field-label">Nomi</span>
-                          <input className="input" value={item.name} onChange={(e) => patchLocation(index, { name: e.target.value })} placeholder="Masalan: Istirohat" />
+                          <span className="field-label">Nomi ({locale.toUpperCase()})</span>
+                          <input
+                            className="input"
+                            value={item.name[locale]}
+                            onChange={(e) => patchLocation(index, { name: { ...item.name, [locale]: e.target.value } })}
+                            placeholder="Masalan: Istirohat"
+                          />
                         </label>
                         <label>
-                          <span className="field-label">Manzil</span>
-                          <input className="input" value={item.address} onChange={(e) => patchLocation(index, { address: e.target.value })} placeholder="Shayxontoxur tumani, Istirohat-258" />
+                          <span className="field-label">Manzil ({locale.toUpperCase()})</span>
+                          <input
+                            className="input"
+                            value={item.address[locale]}
+                            onChange={(e) => patchLocation(index, { address: { ...item.address, [locale]: e.target.value } })}
+                            placeholder="Shayxontoxur tumani, Istirohat-258"
+                          />
                         </label>
                       </div>
                       <div className="field-row">

@@ -9,7 +9,7 @@ function getTelegramLeadEventId() {
 
   const pathname = window.location.pathname.replace(/\/$/, '');
 
-  return pathname.endsWith('/imtixon-1july') || pathname.endsWith('/imtixon-1iyul')
+  return pathname.endsWith('/imtixon-1avgust')
     ? 'bjPNOpBd-wozq1aBm'
     : 'bjPNOpBd-zqujVWo8';
 }

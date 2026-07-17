@@ -9,7 +9,7 @@ import { Logo } from './Logo';
 export function Footer({ locale, settings }: { locale: Locale; settings: Record<string, string> }) {
   const dict = getDict(locale);
   const pathname = usePathname();
-  const isLanding = pathname === `/${locale}/short-landing` || pathname === `/${locale}/long-landing` || pathname === `/${locale}/imtixon-1july`;
+  const isLanding = pathname === `/${locale}/short-landing` || pathname === `/${locale}/long-landing` || pathname === `/${locale}/imtixon-1avgust`;
   const phone = settings['contact.phone'] || '+998 78 888 80 80';
   const phoneLink = settings['contact.phone_link'] || phone.replace(/\D/g, '');
   const tg = settings['contact.telegram'] || 'https://t.me/sodiq_school';

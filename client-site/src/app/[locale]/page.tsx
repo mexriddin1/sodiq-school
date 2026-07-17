@@ -35,8 +35,8 @@ const examLandingAdvantages = [
   {
     accent: '1',
     icon: 'document',
-    title: '1-IYUL IMTIHONI: Biz maktab baholariga aldanib qolmayapmizmi?',
-    body: "Ba'zan kundalikdagi besh baholar ortiga bolaning haqiqiy bilimi yashirinib qoladi. Biz xotirjam yuraveramiz, lekin vaqt o'tib borsa-da, bo'shliqlar to'lmay qolaveradi. 1-iyul kungi imtihon esa shunchaki sinov emas — bu farzandingizning bugungi kungi real darajasini ko'rsatadigan ko'zgu.",
+    title: '1-AVGUST IMTIHONI: Biz maktab baholariga aldanib qolmayapmizmi?',
+    body: "Ba'zan kundalikdagi besh baholar ortiga bolaning haqiqiy bilimi yashirinib qoladi. Biz xotirjam yuraveramiz, lekin vaqt o'tib borsa-da, bo'shliqlar to'lmay qolaveradi. 1-avgust kungi imtihon esa shunchaki sinov emas — bu farzandingizning bugungi kungi real darajasini ko'rsatadigan ko'zgu.",
   },
   {
     accent: '2',
@@ -58,7 +58,7 @@ const examLandingAdvantages = [
   },
 ];
 
-type HomeVariant = 'default' | 'exam-1july';
+type HomeVariant = 'default' | 'exam-1avgust';
 
 export async function HomeContent({
   params,
@@ -74,7 +74,7 @@ export async function HomeContent({
   const s = bundle.settings;
   const phone = s['contact.phone'] || '+998 78 888 80 80';
   const phoneLink = s['contact.phone_link'] || phone.replace(/\D/g, '');
-  const isExamLanding = variant === 'exam-1july';
+  const isExamLanding = variant === 'exam-1avgust';
   const hero = isExamLanding
     ? {
         pill: 'Qabul imtihoni',

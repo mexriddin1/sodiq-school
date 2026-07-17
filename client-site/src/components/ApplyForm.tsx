@@ -49,8 +49,8 @@ export function ApplyForm({ locale, variant = 'full' }: { locale: Locale; varian
       console.error(err);
     } finally {
       form.reset();
-      const fromExamLanding = pathname?.includes('/imtixon-1july') || pathname?.includes('/imtixon-1iyul');
-      router.push(`/${locale}/thanks${fromExamLanding ? '?tg=imtixon-1july' : ''}`);
+      const fromExamLanding = pathname?.includes('/imtixon-1avgust');
+      router.push(`/${locale}/thanks${fromExamLanding ? '?tg=imtixon-1avgust' : ''}`);
     }
   }
 

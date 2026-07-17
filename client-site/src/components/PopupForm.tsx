@@ -18,7 +18,7 @@ export function PopupForm({ locale }: { locale: Locale }) {
   const dict = getDict(locale);
   const pathname = usePathname();
   const router = useRouter();
-  const isLanding = pathname?.includes('/short-landing') || pathname?.includes('/long-landing') || pathname?.includes('/imtixon-1july');
+  const isLanding = pathname?.includes('/short-landing') || pathname?.includes('/long-landing') || pathname?.includes('/imtixon-1avgust');
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const leadFired = useRef(false);
@@ -103,8 +103,8 @@ export function PopupForm({ locale }: { locale: Locale }) {
     } finally {
       form.reset();
       setOpen(false);
-      const fromExamLanding = pathname?.includes('/imtixon-1july') || pathname?.includes('/imtixon-1iyul');
-      router.push(`/${locale}/thanks${fromExamLanding ? '?tg=imtixon-1july' : ''}`);
+      const fromExamLanding = pathname?.includes('/imtixon-1avgust');
+      router.push(`/${locale}/thanks${fromExamLanding ? '?tg=imtixon-1avgust' : ''}`);
     }
   }
 

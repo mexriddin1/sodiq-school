@@ -34,7 +34,9 @@ export default function ThanksPage({ params }: { params: { locale: string } }) {
   return (
     <>
       <Script id="telegram-lead-thanks" strategy="afterInteractive">
-        {`if(new URLSearchParams(window.location.search).get('tg')==='imtixon-1july'){var f=false;var fire=function(){if(f||typeof window.tgp!=='function')return;f=true;window.tgp('event','bjPNOpBd-wozq1aBm');};fire();if(!f){var i=0;var timer=setInterval(function(){i+=1;fire();if(f||i>20)clearInterval(timer);},250);}}`}
+        {/* imtixon-1july is the previous campaign's tag: visitors running cached JS from
+            before the rename still submit it, so keep counting those leads. */}
+        {`var tg=new URLSearchParams(window.location.search).get('tg');if(tg==='imtixon-1avgust'||tg==='imtixon-1july'){var f=false;var fire=function(){if(f||typeof window.tgp!=='function')return;f=true;window.tgp('event','bjPNOpBd-wozq1aBm');};fire();if(!f){var i=0;var timer=setInterval(function(){i+=1;fire();if(f||i>20)clearInterval(timer);},250);}}`}
       </Script>
       <main className="thanks-page">
         <div className="thanks-check" aria-hidden="true">

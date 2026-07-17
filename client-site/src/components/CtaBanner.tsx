@@ -41,7 +41,25 @@ function makeMapUrl(location: Pick<MapLocation, 'lat' | 'lng' | 'zoom' | 'addres
     : '';
 }
 
-function parseMapLocations(settings: Record<string, string>, fallbackAddress: string): MapLocation[] {
+// A map entry's name/address is either a plain string (legacy, one value for every
+// language) or a { uz, ru, en } object. Legacy values are reused as-is; missing
+// translations fall back to Uzbek rather than rendering blank.
+function pickLocaleText(value: unknown, locale: Locale): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') {
+    const byLocale = value as Record<string, unknown>;
+    const picked = byLocale[locale] ?? byLocale.uz;
+    return typeof picked === 'string' ? picked : '';
+  }
+  return '';
+}
+
+function parseMapLocations(
+  settings: Record<string, string>,
+  fallbackAddress: string,
+  locale: Locale,
+): MapLocation[] {
   const raw = settings['contact.map_locations']?.trim();
   if (raw) {
     try {
@@ -50,8 +68,8 @@ function parseMapLocations(settings: Record<string, string>, fallbackAddress: st
         return parsed
           .map((item, index) => {
             const location = {
-              name: String(item?.name || `Manzil ${index + 1}`),
-              address: String(item?.address || ''),
+              name: pickLocaleText(item?.name, locale) || `Manzil ${index + 1}`,
+              address: pickLocaleText(item?.address, locale),
               lat: String(item?.lat || ''),
               lng: String(item?.lng || ''),
               zoom: String(item?.zoom || '16'),
@@ -95,7 +113,7 @@ export function CtaBanner({
   const tg = settings['contact.telegram'] || 'https://t.me/sodiq_school';
   const ig = settings['contact.instagram'] || 'https://instagram.com/sodiqschool.uz';
   const yt = settings['contact.youtube'] || 'https://youtube.com/@sodiq_school';
-  const mapLocations = parseMapLocations(settings, firstContactAddress(address));
+  const mapLocations = parseMapLocations(settings, firstContactAddress(address), locale);
   const mapCountClass =
     mapLocations.length === 1 ? 'map-count-1'
     : mapLocations.length === 2 ? 'map-count-2'
@@ -142,8 +160,8 @@ export function CtaBanner({
       console.error(err);
     } finally {
       form.reset();
-      const fromExamLanding = pathname?.includes('/imtixon-1july') || pathname?.includes('/imtixon-1iyul');
-      router.push(`/${locale}/thanks${fromExamLanding ? '?tg=imtixon-1july' : ''}`);
+      const fromExamLanding = pathname?.includes('/imtixon-1avgust');
+      router.push(`/${locale}/thanks${fromExamLanding ? '?tg=imtixon-1avgust' : ''}`);
     }
   }
 
